@@ -1,0 +1,34 @@
+# 🔹 Node.js / Vite (React Frontend)
+node_modules/
+dist/
+.vite/
+.vscode/
+.DS_Store
+.env
+.env.local
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 🔹 FastAPI (Python Backend)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+.idea/
+*.sqlite3
+instance/
+*.db
+db.sqlite3
+
+# 🔹 MacOS
+.DS_Store
+
+# 🔹 Logs & Temp Files
+*.log
+*.swp
+*.swo
+*.swn

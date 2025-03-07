@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class UserCreate(BaseModel):
     username: str
@@ -16,3 +17,19 @@ class UserResponse(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class CarCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    brand: str
+    model: str
+    year: int
+    price: float
+    mileage: Optional[float] = None
+    fuel_type: str
+    transmission: str
+    location: str
+    seller_id: int
+
+class CarResponse(CarCreate):
+    id: int

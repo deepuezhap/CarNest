@@ -34,4 +34,9 @@ api.interceptors.response.use(
   }
 );
 
+export const fetchCarById = async (id) => {
+  const response = await api.get(`/cars/${id}`);
+  return response.data;
+};
+
 export default api;

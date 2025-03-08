@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { setGlobalLoading } from "./api"; // Import global loading tracker
+import { setGlobalLoading } from "./services/api"; // Import global loading tracker
 import { useEffect } from "react";
 
 const LoadingContext = createContext();
@@ -13,7 +13,7 @@ export const LoadingProvider = ({ children }) => {
   
 
   return (
-    <LoadingContext.Provider value={loading}>
+    <LoadingContext.Provider value={{ loading, setLoading }}>
       {children}
     </LoadingContext.Provider>
   );

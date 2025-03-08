@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import api from "./api"; // Import the Axios instance
 import { useLoading } from "./LoadingContext"; // Import global loading state
 
-
 function App() {
   const [message, setMessage] = useState("Loading...");
   const loading = useLoading(); //

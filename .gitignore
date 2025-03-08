@@ -1,6 +1,7 @@
 # 🔹 Node.js / Vite (React Frontend)
 node_modules/
 dist/
+dist-ssr/
 .vite/
 .vscode/
 .DS_Store
@@ -10,6 +11,8 @@ dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # 🔹 FastAPI (Python Backend)
 __pycache__/
@@ -32,3 +35,13 @@ db.sqlite3
 *.swp
 *.swo
 *.swn
+
+# 🔹 Editor Directories and Files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

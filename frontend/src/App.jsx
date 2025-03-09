@@ -1,11 +1,14 @@
-import React from 'react';
+import NavbarComponent from "./components/layout/NavbarComponent";
+import Hero from "./components/layout/Hero";
+import Footer from "./components/layout/Footer";
+import Home from "./pages/Home";
 
 
 function App() {
   return (
-    <div>
-      
-    </div>
+    <>
+<Home/>
+    </>
   );
 }
 

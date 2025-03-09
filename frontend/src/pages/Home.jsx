@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import Navbar from '../components/layout/Navbar';
+import NavbarComponent from '../components/layout/NavbarComponent';
 import Footer from '../components/layout/Footer';
 import Hero from '../components/layout/Hero';
 import CarList from '../components/cars/CarList';
@@ -34,7 +34,7 @@ const Home = () => {
 
   return (
     <div className="car-selling-platform">
-      <Navbar />
+      <NavbarComponent />
       <Hero />
 
       <Container className="mb-5">

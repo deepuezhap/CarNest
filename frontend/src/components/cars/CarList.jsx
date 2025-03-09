@@ -1,14 +1,10 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import CarCard from './CarCard';
-import { useLoading } from '../../LoadingContext'; // Your context
 
 const CarList = ({ cars, error }) => {
-  const { loading } = useLoading(); // Use your global loading
   
-	if (loading) {
-		return <div className="text-center py-5">Loading...</div>;
-	}
+	
 
   if (error) {
     return (

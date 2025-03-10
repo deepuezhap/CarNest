@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Form, Row, Col, Button, Container } from "react-bootstrap";
-import { useCars } from "../../hooks/useCars" // Custom hook for fetching cars
+import { useCars } from "../../hooks/useCars"; // Custom hook for fetching cars
 
-const CarFilter = () => {
+const CarFilter = ({ updateParams }) => { // Accept updateParams as a prop
   const [filters, setFilters] = useState({
     brand: "",
     model: "",
@@ -11,8 +11,6 @@ const CarFilter = () => {
     fuel_type: "",
     transmission: "",
   });
-
-  const { cars, error, updateParams } = useCars(filters);
 
   // Handle input changes
   const handleChange = (e) => {
@@ -25,7 +23,11 @@ const CarFilter = () => {
 
   // Apply filters when clicking "Search"
   const applyFilters = () => {
-    updateParams(filters);
+    try {
+      updateParams(filters);
+    } catch (error) {
+      console.error("Failed to apply filters:", error);
+    }
   };
 
   return (
@@ -123,9 +125,6 @@ const CarFilter = () => {
       <Button variant="primary" onClick={applyFilters}>
         Search
       </Button>
-
-      {/* Error Handling */}
-      {error && <p className="text-danger mt-3">Error: {error}</p>}
     </Container>
   );
 };

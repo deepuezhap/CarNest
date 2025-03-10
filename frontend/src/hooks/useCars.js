@@ -5,10 +5,12 @@ export const useCars = (initialParams = {}) => {
   const [cars, setCars] = useState([]);
   const [error, setError] = useState(null);
   const [params, setParams] = useState(initialParams);
+  const [loading, setLoading] = useState(false); // Add loading state
 
   useEffect(() => {
     const loadCars = async () => {
       try {
+        setLoading(true); // Set loading to true before fetching
         // Remove empty values before sending request
         const filteredParams = Object.fromEntries(
           Object.entries(params).filter(([_, value]) => value !== "")
@@ -25,7 +27,9 @@ export const useCars = (initialParams = {}) => {
         setError(null);
       } catch (err) {
         console.error("🚨 Error fetching cars:", err);
-        setError(err.message || "Failed to fetch cars");
+        setError(err.response?.data || { detail: "Failed to fetch cars" });
+      } finally {
+        setLoading(false); // Set loading to false after fetch completes
       }
     };
     
@@ -43,5 +47,5 @@ export const useCars = (initialParams = {}) => {
   };
   
 
-  return { cars, error, updateParams };
+  return { cars, error, loading, updateParams }; // Return loading state
 };

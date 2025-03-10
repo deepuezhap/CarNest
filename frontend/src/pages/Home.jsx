@@ -8,7 +8,7 @@ import CarFilter from "../components/cars/CarFilter"; // ✅ Import filter compo
 import { useCars } from "../hooks/useCars";
 
 const Home = () => {
-  const { cars, loading, error } = useCars(); // Fetch cars
+  const { cars, loading, error, updateParams } = useCars(); // Fetch cars and updateParams
 
   return (
     <div className="car-selling-platform">
@@ -19,7 +19,7 @@ const Home = () => {
         <h2 className="mb-4">Browse Our Inventory</h2>
 
         {/* ✅ Add CarFilter Here */}
-        <CarFilter />
+        <CarFilter updateParams={updateParams} className="mb-4" /> {/* Pass updateParams to CarFilter */}
 
         {/* Car List */}
         <CarList cars={cars} loading={loading} error={error} />

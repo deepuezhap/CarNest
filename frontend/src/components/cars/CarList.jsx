@@ -2,14 +2,22 @@ import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import CarCard from './CarCard';
 
-const CarList = ({ cars, error }) => {
+const CarList = ({ cars, loading, error }) => {
   
-	
+	console.log("🔄 CarList received cars:", cars);
+
+  if (loading) {
+    return (
+      <Col className="text-center py-5">
+        <h4>Loading cars...</h4>
+      </Col>
+    );
+  }
 
   if (error) {
     return (
-      <div className="alert alert-danger" role="alert">
-        Error loading cars: {error}
+      <div className="alert alert-warning" role="alert">
+        {error.detail || "Error loading cars"}
       </div>
     );
   }

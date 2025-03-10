@@ -14,12 +14,12 @@ const Home = () => {
     <div className="car-selling-platform">
       <NavbarComponent />
       <Hero />
+       {/* ✅ Add CarFilter Here */}
+       <CarFilter updateParams={updateParams} className="mb-4" /> {/* Pass updateParams to CarFilter */}
 
-      <Container className="mb-5">
-        <h2 className="mb-4">Browse Our Inventory</h2>
-
-        {/* ✅ Add CarFilter Here */}
-        <CarFilter updateParams={updateParams} className="mb-4" /> {/* Pass updateParams to CarFilter */}
+      <Container className="p-4 border rounded shadow mt-5">
+        
+       
 
         {/* Car List */}
         <CarList cars={cars} loading={loading} error={error} />

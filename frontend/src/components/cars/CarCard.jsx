@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Button, Badge } from 'react-bootstrap';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
 const CarCard = ({ car }) => {
   const { 
@@ -38,7 +39,7 @@ const CarCard = ({ car }) => {
           </div>
         </div>
         <div className="d-grid gap-2">
-          <Button variant="primary" href={`/cars/${id}`}>View Details</Button>
+          <Button as={Link} to={`/cars/${id}`} variant="primary">View Details</Button> {/* Use Link for navigation */}
           <Button variant="outline-secondary">Contact Seller</Button>
         </div>
       </Card.Body>

@@ -1,14 +1,15 @@
-import NavbarComponent from "./components/layout/NavbarComponent";
-import Hero from "./components/layout/Hero";
-import Footer from "./components/layout/Footer";
 import Home from "./pages/Home";
-
+import { Routes, Route } from "react-router-dom";
+import NotFound from "./pages/NotFound";
+import CarDetails from "./pages/CarDetails"; // Import CarDetails page
 
 function App() {
   return (
-    <>
-<Home/>
-    </>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/cars/:id" element={<CarDetails />} /> {/* Add CarDetails route */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 

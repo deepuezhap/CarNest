@@ -8,6 +8,7 @@ import { useLoading } from '../LoadingContext';
 
 const CarDetails = () => {
   const { id } = useParams();
+  console.log(id)
   const [car, setCar] = useState(null);
   const { loading, setLoading } = useLoading(); // Use the setLoading function from context
   const [error, setError] = useState(null);

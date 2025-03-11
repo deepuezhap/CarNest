@@ -1,8 +1,7 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from database import Base
-from datetime import datetime
-
+from datetime import datetime, timezone
 
 class User(Base):
     __tablename__ = "users"
@@ -13,7 +12,6 @@ class User(Base):
     hashed_password = Column(String)
 
     cars = relationship("Car", back_populates="seller")  # One-to-Many Relationship
-
 
 class Car(Base):
     __tablename__ = "cars"
@@ -30,7 +28,8 @@ class Car(Base):
     transmission = Column(String)
     location = Column(String)
     seller_id = Column(Integer, ForeignKey("users.id"))
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    sold = Column(Boolean, default=False)  # Add sold field
 
     seller = relationship("User", back_populates="cars")

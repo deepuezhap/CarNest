@@ -11,8 +11,6 @@ car_router = APIRouter()
 def add_car(car: CarCreate, db: Session = Depends(get_db)):
     return create_car(db, car)
 
-
-
 @car_router.delete("/{car_id}")
 def remove_car(car_id: int, db: Session = Depends(get_db)):
     delete_car(db, car_id)

@@ -64,3 +64,14 @@ def get_filtered_cars(
 
     # ✅ Apply pagination at the END
     return query.offset(offset).limit(limit).all()
+
+def get_user_cars(db: Session, user_id: int) -> List[Car]:
+    return db.query(Car).filter(Car.seller_id == user_id).all()
+
+def mark_car_as_sold(db: Session, car_id: int):
+    car = db.query(Car).filter(Car.id == car_id).first()
+    if car:
+        car.sold = True
+        db.commit()
+        db.refresh(car)
+    return car

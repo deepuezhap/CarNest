@@ -6,6 +6,7 @@ from .auth import get_current_user
 from sqlalchemy.orm import Session
 from dependencies import get_db
 from crud import create_car, get_car, delete_car, get_filtered_cars, get_user_cars, mark_car_as_sold
+import logging
 
 protected_router = APIRouter()
 
@@ -22,7 +23,10 @@ def fetch_car(car_id: int, db: Session = Depends(get_db), user: User = Depends(g
 
 @protected_router.get("/user/cars", response_model=List[CarResponse])
 def fetch_user_cars(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    return get_user_cars(db, user.id)
+    logging.info(f"Fetching cars for user ID: {user.id}")
+    user_cars = get_user_cars(db, user.id)
+    logging.info(f"Found {len(user_cars)} cars for user ID: {user.id}")
+    return user_cars
 
 @protected_router.patch("/cars/{car_id}/sold")
 def mark_as_sold(car_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):

@@ -19,7 +19,7 @@ const Signup = () => {
       });
 
       localStorage.setItem("token", response.data.access_token);
-      navigate("/dashboard");  // Redirect on success
+      navigate("/");  // Redirect to home page
     } catch (err) {
       setError("Signup failed. Try again!");
     }

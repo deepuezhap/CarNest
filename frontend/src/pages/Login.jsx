@@ -23,7 +23,7 @@ const Login = () => {
       );
 
       localStorage.setItem("token", response.data.access_token);
-      navigate("/dashboard"); // Redirect to dashboard after login
+      navigate("/"); // Redirect to home after login
     } catch (err) {
       setError(err.response?.data?.detail || "Invalid credentials!");
     } finally {

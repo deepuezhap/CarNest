@@ -11,12 +11,7 @@ car_router = APIRouter()
 def add_car(car: CarCreate, db: Session = Depends(get_db)):
     return create_car(db, car)
 
-@car_router.get("/{car_id}", response_model=CarResponse)
-def fetch_car(car_id: int, db: Session = Depends(get_db)):
-    car = get_car(db, car_id)
-    if not car:
-        raise HTTPException(status_code=404, detail="Car not found")
-    return car
+
 
 @car_router.delete("/{car_id}")
 def remove_car(car_id: int, db: Session = Depends(get_db)):

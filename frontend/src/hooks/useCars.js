@@ -38,12 +38,14 @@ export const useCars = (initialParams = {}) => {
   }, [params]);
 
   const updateParams = (newParams) => {
+    // Reset params to an empty object before applying new filters
+    setParams({});
     // Remove empty values before sending API request
     const filteredParams = Object.fromEntries(
       Object.entries(newParams).filter(([_, value]) => value !== "")
     );
   
-    setParams((prev) => ({ ...prev, ...filteredParams }));
+    setParams(filteredParams);
   };
   
 

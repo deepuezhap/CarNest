@@ -4,8 +4,6 @@ import CarCard from './CarCard';
 
 const CarList = ({ cars, loading, error }) => {
   
-	console.log("🔄 CarList received cars:", cars);
-
   if (loading) {
     return (
       <Col className="text-center py-5">

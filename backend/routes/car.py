@@ -1,12 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from schemas import CarCreate, CarResponse
 from crud import create_car, get_car, delete_car, get_filtered_cars
 from dependencies import get_db
+import shutil
+import os
 
 car_router = APIRouter()
 
+UPLOAD_DIR = "./images/"
+os.makedirs(UPLOAD_DIR, exist_ok=True)  # Ensure directory exists
 
 
 
@@ -28,3 +32,21 @@ def fetch_cars(
         raise HTTPException(status_code=404, detail="No cars found with the given filters")
     
     return cars
+
+@car_router.post("/upload-image/")
+def upload_car_image(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """Handles image upload and returns the file path."""
+    
+    file_extension = file.filename.split(".")[-1]  # Get file extension
+    if file_extension not in ["jpg", "jpeg", "png", "webp"]:
+        raise HTTPException(status_code=400, detail="Invalid image format")
+
+    # Create unique filename
+    file_path = os.path.join(UPLOAD_DIR, file.filename)
+    
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)  # Save file
+
+    # Return accessible image path
+    image_url = f"http://localhost:8000/images/{file.filename}"
+    return {"image_url": image_url}

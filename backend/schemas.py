@@ -14,6 +14,8 @@ class CarCreate(BaseModel):
     transmission: Literal['Automatic', 'Manual']  
     location: str
     image_path: Optional[str] = None
+    seller_id: Optional[int] = None
+
     
     # Boolean attributes for specific features
     has_power_windows: bool = False
@@ -41,7 +43,6 @@ class CarCreate(BaseModel):
 class CarResponse(CarCreate):
     id: int
     sold: bool
-    seller_id: int
     created_at: datetime
     latitude: Optional[float] = None  # For proximity search (optional)
     longitude: Optional[float] = None # For proximity search (optional)

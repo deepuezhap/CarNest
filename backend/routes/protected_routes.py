@@ -12,7 +12,7 @@ protected_router = APIRouter()
 
 @protected_router.get("/protected")
 def protected_route(user: User = Depends(get_current_user)):
-    return {"message": f"Hello {user.username}, you have access to this protected route!"}
+    return {"message": f"Hello {user.username}, Welcome to dashboard!"}
 
 @protected_router.get("/cars/{car_id}", response_model=CarResponse)
 def fetch_car(car_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):

@@ -6,7 +6,7 @@ from routes.protected_routes import protected_router
 from routes.car import car_router  # Car route already in `routes/`
 from fastapi.middleware.cors import CORSMiddleware
 import time
-
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -36,6 +36,9 @@ app.include_router(protected_router, prefix="/api", tags=["Protected"])
 
 # Include car routes
 app.include_router(car_router, prefix="/cars", tags=["Cars"])
+
+# Serve images from the "images" folder
+app.mount("/images", StaticFiles(directory="./images/"), name="images")
 
 @app.get("/")
 def home():

@@ -47,7 +47,7 @@ def get_filtered_cars(
     limit: int = 10,
     offset: int = 0
 ) -> List[Car]:
-    query = db.query(Car)
+    query = db.query(Car).filter(Car.sold == False)  # Filter out sold cars
 
     if brand:
         query = query.filter(Car.brand.ilike(f"%{brand}%"))
@@ -62,7 +62,7 @@ def get_filtered_cars(
     if transmission:
         query = query.filter(Car.transmission == transmission)
 
-    # ✅ Apply pagination at the END
+    # Apply pagination at the END
     return query.offset(offset).limit(limit).all()
 
 def get_user_cars(db: Session, user_id: int) -> List[Car]:

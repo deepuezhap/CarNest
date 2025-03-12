@@ -20,7 +20,7 @@ const CarDetails = () => {
         });
         setCar(response.data); // Set the car details in state
       } catch (err) {
-        setError("Failed to load car details"); // Set error message if request fails
+        setError("Sign in to view the car details"); // Set error message if request fails
       } finally {
         setLoading(false); // Set loading to false after request completes
       }
@@ -30,7 +30,7 @@ const CarDetails = () => {
   }, [id]); // Dependency array to re-run effect when `id` changes
 
   if (loading) return <Spinner animation="border" className="d-block mx-auto mt-5" />; // Show spinner while loading
-  if (error) return <Alert variant="danger" className="mt-3">{error}</Alert>; // Show error message if there's an error
+  if (error) return <Alert variant="warning" className="mt-3">{error}</Alert>; // Show error message if there's an error
   if (!car) return <Alert variant="warning" className="mt-3">Car not found</Alert>; // Show message if car not found
 
   return (

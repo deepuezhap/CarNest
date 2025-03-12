@@ -33,3 +33,4 @@ class CarCreate(BaseModel):
 
 class CarResponse(CarCreate):
     id: int
+    sold: bool

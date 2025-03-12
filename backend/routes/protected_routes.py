@@ -36,3 +36,18 @@ def mark_as_sold(car_id: int, db: Session = Depends(get_db), user: User = Depend
     if car.seller_id != user.id:
         raise HTTPException(status_code=403, detail="Not authorized to mark this car as sold")
     return mark_car_as_sold(db, car_id)
+
+@protected_router.post("/cars", response_model=CarResponse)
+def add_car(car: CarCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    car.seller_id = user.id
+    return create_car(db, car)
+
+@protected_router.delete("/cars/{car_id}")
+def remove_car(car_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    car = get_car(db, car_id)
+    if not car:
+        raise HTTPException(status_code=404, detail="Car not found")
+    if car.seller_id != user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this car")
+    delete_car(db, car_id)
+    return {"message": "Car deleted"}

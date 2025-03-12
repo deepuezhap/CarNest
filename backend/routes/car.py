@@ -7,14 +7,8 @@ from dependencies import get_db
 
 car_router = APIRouter()
 
-@car_router.post("/", response_model=CarResponse)
-def add_car(car: CarCreate, db: Session = Depends(get_db)):
-    return create_car(db, car)
 
-@car_router.delete("/{car_id}")
-def remove_car(car_id: int, db: Session = Depends(get_db)):
-    delete_car(db, car_id)
-    return {"message": "Car deleted"}
+
 
 @car_router.get("/", response_model=List[CarResponse])
 def fetch_cars(

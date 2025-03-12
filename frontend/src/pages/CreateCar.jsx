@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { Container, Card, Button, Form, Alert } from "react-bootstrap";
+import { Container, Card, Button, Form, Alert, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const CreateCar = () => {
@@ -14,7 +14,23 @@ const CreateCar = () => {
     mileage: "",
     fuel_type: "",
     transmission: "",
-    location: ""
+    location: "",
+    has_power_windows: false,
+    has_power_steering: false,
+    num_previous_owners: 0,
+    insurance_status: "",
+    registration_location: "",
+    has_car_history_report: false,
+    has_rear_parking_sensors: false,
+    has_central_locking: false,
+    has_air_conditioning: false,
+    has_reverse_camera: false,
+    has_abs: false,
+    has_fog_lamps: false,
+    has_power_mirrors: false,
+    has_gps_navigation: false,
+    has_keyless_start: false,
+    image: null // Add image field
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -22,13 +38,33 @@ const CreateCar = () => {
   const handleCreateCar = async () => {
     const token = localStorage.getItem("token");
     try {
-      await axios.post("http://localhost:8000/api/cars", newCar, {
+      // Upload image first
+      let imageUrl = "";
+      if (newCar.image) {
+        const formData = new FormData();
+        formData.append("file", newCar.image);
+        const uploadResponse = await axios.post("http://localhost:8000/cars/upload-image/", formData, {
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
+        });
+        imageUrl = uploadResponse.data.image_url;
+      }
+
+      // Create car listing with image URL
+      await axios.post("http://localhost:8000/api/cars", { ...newCar, image_path: imageUrl }, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/dashboard");
     } catch (err) {
       setError("Failed to create car listing.");
     }
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked, files } = e.target;
+    setNewCar((prevCar) => ({
+      ...prevCar,
+      [name]: type === "checkbox" ? checked : type === "file" ? files[0] : value,
+    }));
   };
 
   return (
@@ -41,80 +77,223 @@ const CreateCar = () => {
             <Form.Label>Title</Form.Label>
             <Form.Control
               type="text"
+              name="title"
               value={newCar.title}
-              onChange={(e) => setNewCar({ ...newCar, title: e.target.value })}
+              onChange={handleChange}
             />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Description</Form.Label>
             <Form.Control
               type="text"
+              name="description"
               value={newCar.description}
-              onChange={(e) => setNewCar({ ...newCar, description: e.target.value })}
+              onChange={handleChange}
             />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Brand</Form.Label>
             <Form.Control
               type="text"
+              name="brand"
               value={newCar.brand}
-              onChange={(e) => setNewCar({ ...newCar, brand: e.target.value })}
+              onChange={handleChange}
             />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Model</Form.Label>
             <Form.Control
               type="text"
+              name="model"
               value={newCar.model}
-              onChange={(e) => setNewCar({ ...newCar, model: e.target.value })}
+              onChange={handleChange}
             />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Year</Form.Label>
             <Form.Control
               type="number"
+              name="year"
               value={newCar.year}
-              onChange={(e) => setNewCar({ ...newCar, year: e.target.value })}
+              onChange={handleChange}
             />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Price</Form.Label>
             <Form.Control
               type="number"
+              name="price"
               value={newCar.price}
-              onChange={(e) => setNewCar({ ...newCar, price: e.target.value })}
+              onChange={handleChange}
             />
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Mileage</Form.Label>
             <Form.Control
               type="number"
+              name="mileage"
               value={newCar.mileage}
-              onChange={(e) => setNewCar({ ...newCar, mileage: e.target.value })}
+              onChange={handleChange}
             />
           </Form.Group>
+          
+          {/* Fuel Type Dropdown */}
           <Form.Group className="mb-3">
             <Form.Label>Fuel Type</Form.Label>
             <Form.Control
-              type="text"
+              as="select"
+              name="fuel_type"
               value={newCar.fuel_type}
-              onChange={(e) => setNewCar({ ...newCar, fuel_type: e.target.value })}
-            />
+              onChange={handleChange}
+            >
+              <option value="">Select Fuel Type</option>
+              <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
+              <option value="Electric">Electric</option>
+              <option value="Hybrid">Hybrid</option>
+            </Form.Control>
           </Form.Group>
+          
+          {/* Transmission Dropdown */}
           <Form.Group className="mb-3">
             <Form.Label>Transmission</Form.Label>
             <Form.Control
-              type="text"
+              as="select"
+              name="transmission"
               value={newCar.transmission}
-              onChange={(e) => setNewCar({ ...newCar, transmission: e.target.value })}
-            />
+              onChange={handleChange}
+            >
+              <option value="">Select Transmission</option>
+              <option value="Automatic">Automatic</option>
+              <option value="Manual">Manual</option>
+            </Form.Control>
           </Form.Group>
+          
+          {/* Insurance Status Dropdown */}
+          <Form.Group className="mb-3">
+            <Form.Label>Insurance Status</Form.Label>
+            <Form.Control
+              as="select"
+              name="insurance_status"
+              value={newCar.insurance_status}
+              onChange={handleChange}
+            >
+              <option value="">Select Insurance Status</option>
+              <option value="Insured">Insured</option>
+              <option value="Not Insured">Not Insured</option>
+            </Form.Control>
+          </Form.Group>
+
           <Form.Group className="mb-3">
             <Form.Label>Location</Form.Label>
             <Form.Control
               type="text"
+              name="location"
               value={newCar.location}
-              onChange={(e) => setNewCar({ ...newCar, location: e.target.value })}
+              onChange={handleChange}
+            />
+          </Form.Group>
+
+          <Row>
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Check
+                  type="checkbox"
+                  label="Power Windows"
+                  name="has_power_windows"
+                  checked={newCar.has_power_windows}
+                  onChange={handleChange}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Power Steering"
+                  name="has_power_steering"
+                  checked={newCar.has_power_steering}
+                  onChange={handleChange}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Car History Report"
+                  name="has_car_history_report"
+                  checked={newCar.has_car_history_report}
+                  onChange={handleChange}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Rear Parking Sensors"
+                  name="has_rear_parking_sensors"
+                  checked={newCar.has_rear_parking_sensors}
+                  onChange={handleChange}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Central Locking"
+                  name="has_central_locking"
+                  checked={newCar.has_central_locking}
+                  onChange={handleChange}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Air Conditioning"
+                  name="has_air_conditioning"
+                  checked={newCar.has_air_conditioning}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+            </Col>
+            <Col>
+              <Form.Group className="mb-3">
+                <Form.Check
+                  type="checkbox"
+                  label="Reverse Camera"
+                  name="has_reverse_camera"
+                  checked={newCar.has_reverse_camera}
+                  onChange={handleChange}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="ABS"
+                  name="has_abs"
+                  checked={newCar.has_abs}
+                  onChange={handleChange}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Fog Lamps"
+                  name="has_fog_lamps"
+                  checked={newCar.has_fog_lamps}
+                  onChange={handleChange}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Power Mirrors"
+                  name="has_power_mirrors"
+                  checked={newCar.has_power_mirrors}
+                  onChange={handleChange}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="GPS Navigation"
+                  name="has_gps_navigation"
+                  checked={newCar.has_gps_navigation}
+                  onChange={handleChange}
+                />
+                <Form.Check
+                  type="checkbox"
+                  label="Keyless Start"
+                  name="has_keyless_start"
+                  checked={newCar.has_keyless_start}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Form.Group className="mb-3">
+            <Form.Label>Image</Form.Label>
+            <Form.Control
+              type="file"
+              name="image"
+              onChange={handleChange}
             />
           </Form.Group>
         </Form>

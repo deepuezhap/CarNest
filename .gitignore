@@ -26,6 +26,7 @@ venv/
 instance/
 *.db
 db.sqlite3
+backend/images/  # Add images directory to .gitignore
 
 # 🔹 MacOS
 .DS_Store

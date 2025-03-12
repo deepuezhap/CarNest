@@ -12,8 +12,6 @@ car_router = APIRouter()
 UPLOAD_DIR = "./images/"
 os.makedirs(UPLOAD_DIR, exist_ok=True)  # Ensure directory exists
 
-
-
 @car_router.get("/", response_model=List[CarResponse])
 def fetch_cars(
     db: Session = Depends(get_db),

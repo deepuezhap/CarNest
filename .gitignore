@@ -27,6 +27,10 @@ instance/
 *.db
 db.sqlite3
 backend/images/  # Add images directory to .gitignore
+*.jpeg
+*.jpg 
+*.webp
+*.png
 
 # 🔹 MacOS
 .DS_Store

@@ -10,7 +10,7 @@ class CarCreate(BaseModel):
     year: int
     price: float
     mileage: Optional[float] = None
-    fuel_type: Literal['Petrol', 'Diesel', 'Electric']
+    fuel_type: Literal['Petrol', 'Diesel', 'Electric','CNG']
     transmission: Literal['Automatic', 'Manual']  
     location: str
     image_path: Optional[str] = None

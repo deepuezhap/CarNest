@@ -26,7 +26,7 @@ venv/
 instance/
 *.db
 db.sqlite3
-backend/images/  # Add images directory to .gitignore
+./backend/images/  # Add images directory to .gitignore
 *.jpeg
 *.jpg 
 *.webp

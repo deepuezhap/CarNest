@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { Container, Card, Button, Form, Alert, Row, Col } from "react-bootstrap";
+import { Container, Card, Button, Form, ListGroup, Alert, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const CreateCar = () => {
@@ -14,7 +14,7 @@ const CreateCar = () => {
     mileage: "",
     fuel_type: "",
     transmission: "",
-    location: "",
+    location: "", // City name
     has_power_windows: false,
     has_power_steering: false,
     num_previous_owners: 0,
@@ -30,15 +30,58 @@ const CreateCar = () => {
     has_power_mirrors: false,
     has_gps_navigation: false,
     has_keyless_start: false,
-    image: null // Add image field
+    image: null,
+    latitude: "", // Latitude field
+    longitude: "" // Longitude field
   });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState({ lat: "", lon: "" });
+  
+  const handleLocationChange = async (e) => {
+    const query = e.target.value;
+    setNewCar((prevCar) => ({ ...prevCar, location: query }));
+  
+    if (query.length > 2) {
+      try {
+        const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
+          params: {
+            q: query,
+            format: "json",
+            addressdetails: 1,
+          },
+        });
+        setSearchResults(response.data);
+      } catch (error) {
+        console.error("Error fetching locations:", error);
+      }
+    } else {
+      setSearchResults([]);
+    }
+  };
+  
+  const handleSelectLocation = (location) => {
+    const cityName = location.address.city || location.address.town || location.address.village || location.display_name;
+    
+    setNewCar((prevCar) => ({
+      ...prevCar,
+      location: cityName,
+      latitude: location.lat,
+      longitude: location.lon
+    }));
+    setSelectedLocation({ lat: location.lat, lon: location.lon });
+    setSearchResults([]);
+    
+    // Log the latitude and longitude to the console
+    console.log("Selected Location:", cityName);
+    console.log("Latitude:", location.lat);
+    console.log("Longitude:", location.lon);
+  };
 
   const handleCreateCar = async () => {
     const token = localStorage.getItem("token");
     try {
-      // Upload image first
       let imageUrl = "";
       if (newCar.image) {
         const formData = new FormData();
@@ -48,9 +91,19 @@ const CreateCar = () => {
         });
         imageUrl = uploadResponse.data.image_url;
       }
-
-      // Create car listing with image URL
-      await axios.post("http://localhost:8000/api/cars", { ...newCar, image_path: imageUrl }, {
+  
+      // Ensure latitude and longitude are included in the payload
+      const carData = {
+        ...newCar,
+        image_path: imageUrl,
+        latitude: newCar.latitude, // Ensure latitude is included
+        longitude: newCar.longitude // Ensure longitude is included
+      };
+  
+      // Log the payload for debugging
+      console.log("Car Data Payload:", carData);
+  
+      await axios.post("http://localhost:8000/api/cars", carData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/dashboard");
@@ -190,8 +243,22 @@ const CreateCar = () => {
               type="text"
               name="location"
               value={newCar.location}
-              onChange={handleChange}
+              onChange={handleLocationChange}
+              placeholder="Enter location..."
             />
+            {searchResults.length > 0 && (
+              <ListGroup className="position-absolute w-100">
+                {searchResults.map((location, index) => (
+                  <ListGroup.Item
+                    key={index}
+                    action
+                    onClick={() => handleSelectLocation(location)}
+                  >
+                    {location.display_name}
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            )}
           </Form.Group>
 
           <Row>

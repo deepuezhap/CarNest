@@ -1,14 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
+
 
 const NavbarComponent = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const validateToken = (token) => {
+    try {
+      const decodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000; // Current time in seconds
+      if (decodedToken.exp > currentTime) {
+        return true;
+      } else {
+        localStorage.removeItem("token"); // Token expired, remove it
+        return false;
+      }
+    } catch (error) {
+      console.error("Token is invalid:", error);
+      localStorage.removeItem("token");
+      return false;
+    }
+  };
+
+  const checkToken = () => {
     const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    if (token) {
+      setIsLoggedIn(validateToken(token));
+    } else {
+      setIsLoggedIn(false);
+    }
+  };
+
+  useEffect(() => {
+    checkToken();
+
+    const interval = setInterval(checkToken, 60000); // Check token every minute
+
+    window.addEventListener('storage', checkToken);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', checkToken);
+    };
   }, []);
 
   const handleLogout = () => {

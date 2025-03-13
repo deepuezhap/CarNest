@@ -1,11 +1,12 @@
 import React from 'react';
 import { Card, Button, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { FaTachometerAlt, FaCalendarAlt, FaGasPump, FaCogs, FaMapMarkerAlt } from 'react-icons/fa'; // Import icons
 
 const CarCard = ({ car }) => {
   const { 
-    id, title, price, mileage, year, fuelType,
-    transmission, image, location, featured 
+    id, title, price, mileage, year, fuel_type,
+    transmission, image_path, location, featured 
   } = car;
 
   return (
@@ -15,27 +16,27 @@ const CarCard = ({ car }) => {
           <Badge bg="warning" text="dark">Featured</Badge>
         </div>
       )}
-      <Card.Img variant="top" src={image} alt={title} />
+      <Card.Img variant="top" src={image_path} alt={title} style={{ width: "100%", height: "200px", objectFit: "cover" }} /> {/* Display car image */}
       <Card.Body>
         <Card.Title>{title}</Card.Title>
         <Card.Text className="text-primary fw-bold fs-4">${price.toLocaleString()}</Card.Text>
         <div className="d-flex mb-3 text-muted small">
           <div className="me-3">
-            <i className="bi bi-speedometer2 me-1"></i> {mileage.toLocaleString()} miles
+            <FaTachometerAlt className="me-1" /> {mileage.toLocaleString()} miles
           </div>
           <div className="me-3">
-            <i className="bi bi-calendar me-1"></i> {year}
+            <FaCalendarAlt className="me-1" /> {year}
           </div>
           <div>
-            <i className="bi bi-fuel-pump me-1"></i> {fuelType}
+            <FaGasPump className="me-1" /> {fuel_type}
           </div>
         </div>
         <div className="d-flex mb-3 text-muted small">
           <div className="me-3">
-            <i className="bi bi-gear me-1"></i> {transmission}
+            <FaCogs className="me-1" /> {transmission}
           </div>
           <div>
-            <i className="bi bi-geo-alt me-1"></i> {location}
+            <FaMapMarkerAlt className="me-1" /> {location}
           </div>
         </div>
         <div className="d-grid gap-2">

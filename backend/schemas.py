@@ -15,6 +15,8 @@ class CarCreate(BaseModel):
     location: str
     image_path: Optional[str] = None
     seller_id: Optional[int] = None
+    latitude: Optional[float] = None  # For proximity search (optional)
+    longitude: Optional[float] = None # For proximity search (optional)
 
     
     # Boolean attributes for specific features
@@ -44,8 +46,7 @@ class CarResponse(CarCreate):
     id: int
     sold: bool
     created_at: datetime
-    latitude: Optional[float] = None  # For proximity search (optional)
-    longitude: Optional[float] = None # For proximity search (optional)
+    
 
     class Config:
         # This tells Pydantic to read from attributes for ORM models (SQLAlchemy)

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Container, Card, Spinner, Alert, Button, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import NavbarComponent from "../components/layout/NavbarComponent";
 
 const Dashboard = () => {
   const [content, setContent] = useState("");
@@ -77,6 +78,8 @@ const Dashboard = () => {
   };
 
   return (
+    <>
+    <NavbarComponent/>
     <Container className="d-flex flex-column align-items-center vh-100">
       <Card style={{ width: "100%", maxWidth: "800px" }} className="p-4 shadow mt-5">
         <h2 className="text-center">Dashboard</h2>
@@ -126,6 +129,7 @@ const Dashboard = () => {
         </Button>
       </Card>
     </Container>
+    </>
   );
 };
 

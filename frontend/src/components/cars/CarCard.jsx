@@ -6,16 +6,11 @@ import { FaTachometerAlt, FaCalendarAlt, FaGasPump, FaCogs, FaMapMarkerAlt } fro
 const CarCard = ({ car }) => {
   const { 
     id, title, price, mileage, year, fuel_type,
-    transmission, image_path, location, featured 
+    transmission, image_path, location, seller_id 
   } = car;
-
+  const blah = ()=>console.log(seller_id);
   return (
     <Card>
-      {featured && (
-        <div className="position-absolute" style={{ top: '10px', right: '10px' }}>
-          <Badge bg="warning" text="dark">Featured</Badge>
-        </div>
-      )}
       <Card.Img variant="top" src={image_path} alt={title} style={{ width: "100%", height: "200px", objectFit: "cover" }} /> {/* Display car image */}
       <Card.Body>
         <Card.Title>{title}</Card.Title>
@@ -41,7 +36,7 @@ const CarCard = ({ car }) => {
         </div>
         <div className="d-grid gap-2">
           <Button as={Link} to={`/cars/${id}`} variant="primary">View Details</Button> {/* Use Link for navigation */}
-          <Button variant="outline-secondary">Contact Seller</Button>
+  <Button variant="outline-secondary" onClick={blah}>Contact Seller</Button>
         </div>
       </Card.Body>
     </Card>

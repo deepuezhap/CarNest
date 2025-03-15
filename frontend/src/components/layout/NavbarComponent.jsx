@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
@@ -6,9 +6,15 @@ import useAuth from '../../hooks/useAuth';
 const NavbarComponent = () => {
   const currentUser = useAuth();
   const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(!!currentUser);
+
+  useEffect(() => {
+    setIsAuthenticated(!!currentUser);
+  }, [currentUser]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    setIsAuthenticated(false);
     navigate("/");
   };
 
@@ -26,7 +32,7 @@ const NavbarComponent = () => {
             <Nav.Link as={Link} to="/about">About Us</Nav.Link>
           </Nav>
           <Nav>
-            {currentUser ? (
+            {isAuthenticated ? (
               <>
                 <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
                 <Button variant="outline-light" onClick={handleLogout}>Logout</Button>

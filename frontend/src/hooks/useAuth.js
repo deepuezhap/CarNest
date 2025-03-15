@@ -7,10 +7,14 @@ const useAuth = () => {
   const validateToken = (token) => {
     try {
       const decodedToken = jwtDecode(token);
+      console.log("Decoded Token:", decodedToken);
       const currentTime = Date.now() / 1000; // Current time in seconds
       if (decodedToken.exp > currentTime) {
         console.log("User authenticated:", decodedToken); // Debugging
-        return decodedToken;
+        return {
+          userId: decodedToken.userId,
+          username: decodedToken.username,
+        };
       } else {
         localStorage.removeItem("token"); // Token expired, remove it
         return null;

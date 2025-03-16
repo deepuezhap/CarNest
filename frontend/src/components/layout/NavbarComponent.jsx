@@ -26,10 +26,8 @@ const NavbarComponent = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/">Home</Nav.Link>
-            <Nav.Link as={Link} to="/browse">Browse Cars</Nav.Link>
-            <Nav.Link as={Link} to="/sell">Sell Your Car</Nav.Link>
-            <Nav.Link as={Link} to="/financing">Financing</Nav.Link>
-            <Nav.Link as={Link} to="/about">About Us</Nav.Link>
+            <Nav.Link as={Link} to="/create-car">Sell Your Car</Nav.Link>
+            
           </Nav>
           <Nav>
             {isAuthenticated ? (

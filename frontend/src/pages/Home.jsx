@@ -18,10 +18,7 @@ const Home = () => {
        <CarFilter updateParams={updateParams} className="mb-4" /> {/* Pass updateParams to CarFilter */}
 
       <Container className="p-4 border rounded shadow mt-5">
-        
-       
-
-        {/* Car List */}
+                {/* Car List */}
         <CarList cars={cars} loading={loading} error={error} />
       </Container>
 

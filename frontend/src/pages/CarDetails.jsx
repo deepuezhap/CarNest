@@ -4,40 +4,44 @@ import { Container, Card, Spinner, Alert, ListGroup, Row, Col } from "react-boot
 import api from "../services/api";
 import NavbarComponent from "../components/layout/NavbarComponent"; // Import NavbarComponent
 import { FaGasPump, FaCogs, FaMapMarkerAlt, FaCalendarAlt, FaTachometerAlt } from "react-icons/fa"; // Import icons
-import useAuth from "../hooks/useAuth"; // Import useAuth hook
+import useAuth from "../hooks/useAuth";
 
 const CarDetails = () => {
   const { id } = useParams(); // Get the car ID from the URL
   const [car, setCar] = useState(null); // State to store car details
   const [loading, setLoading] = useState(true); // State to manage loading state
   const [error, setError] = useState(null); // State to manage error state
-  const currentUser = useAuth(); // Use useAuth hook to get the current user
+
+
 
   useEffect(() => {
-    const fetchCarDetails = async () => {
-      if (!currentUser) {
-        setError("Sign in to view the car details");
-        setLoading(false);
-        return;
-      }
 
+    const fetchCarDetails = async () => {
+      const token = localStorage.getItem("token");
+        if (!token) {
+          setError("No token found, please sign in.");
+          setLoading(false);
+          return;
+        }
       try {
-        const token = localStorage.getItem("token"); // Get the token from local storage
+
+        console.log("Fetching car details with token:", token); // Debugging
+  
         const response = await api.get(`/api/cars/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the request headers
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setCar(response.data); // Set the car details in state
+  
+        setCar(response.data);
       } catch (err) {
-        setError("Failed to fetch car details"); // Set error message if request fails
+        setError("Failed to fetch car details");
       } finally {
-        setLoading(false); // Set loading to false after request completes
+        setLoading(false);
       }
     };
-
-    fetchCarDetails(); // Fetch car details when component mounts
-  }, [id, currentUser]); // Dependency array to re-run effect when `id` or `currentUser` changes
+  
+    fetchCarDetails();
+  }, []); // Depend on `currentUser`
+  
 
   if (loading) return <Spinner animation="border" className="d-block mx-auto mt-5" />; // Show spinner while loading
   if (error) return <Alert variant="warning" className="mt-3">{error}</Alert>; // Show error message if there's an error

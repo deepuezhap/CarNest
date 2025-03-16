@@ -6,6 +6,7 @@ export const useCars = (initialParams = {}) => {
   const [error, setError] = useState(null);
   const [params, setParams] = useState(initialParams);
   const [loading, setLoading] = useState(false); // Add loading state
+  const [totalCars, setTotalCars] = useState(0); // Add totalCars state
 
   useEffect(() => {
     const loadCars = async () => {
@@ -24,6 +25,7 @@ export const useCars = (initialParams = {}) => {
     
         const response = await api.get(requestUrl);
         setCars(response.data);
+        setTotalCars(response.headers['x-total-count']); // Set totalCars from response headers
         setError(null);
       } catch (err) {
         console.error("🚨 Error fetching cars:", err);
@@ -49,5 +51,5 @@ export const useCars = (initialParams = {}) => {
   };
   
 
-  return { cars, error, loading, updateParams }; // Return loading state
+  return { cars, error, loading, updateParams, totalCars }; // Return loading state and totalCars
 };

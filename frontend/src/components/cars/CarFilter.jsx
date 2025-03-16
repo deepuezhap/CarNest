@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { Form, Row, Col, Button, Container } from "react-bootstrap";
-import RangeSlider from 'react-bootstrap-range-slider';
 import { useCars } from "../../hooks/useCars"; // Custom hook for fetching cars
 
 const CarFilter = ({ updateParams }) => { // Accept updateParams as a prop
   const [filters, setFilters] = useState({
     brand: "",
     model: "",
-    min_price: 0,
-    max_price: 100000,
+    min_price: "",
+    max_price: "",
     fuel_type: "",
     transmission: "",
   });
@@ -16,14 +15,6 @@ const CarFilter = ({ updateParams }) => { // Accept updateParams as a prop
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: value,
-    }));
-  };
-
-  // Handle slider changes
-  const handleSliderChange = (name, value) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
       [name]: value,
@@ -78,13 +69,12 @@ const CarFilter = ({ updateParams }) => { // Accept updateParams as a prop
         <Col md={4}>
           <Form.Group>
             <Form.Label>Min Price</Form.Label>
-            <RangeSlider
+            <Form.Control
+              type="number"
+              name="min_price"
               value={filters.min_price}
-              onChange={(e) => handleSliderChange('min_price', e.target.value)}
-              min={0}
-              max={100000}
-              step={1000}
-              tooltip='auto'
+              onChange={handleChange}
+              placeholder="Enter minimum price"
             />
           </Form.Group>
         </Col>
@@ -93,13 +83,12 @@ const CarFilter = ({ updateParams }) => { // Accept updateParams as a prop
         <Col md={4}>
           <Form.Group>
             <Form.Label>Max Price</Form.Label>
-            <RangeSlider
+            <Form.Control
+              type="number"
+              name="max_price"
               value={filters.max_price}
-              onChange={(e) => handleSliderChange('max_price', e.target.value)}
-              min={0}
-              max={1000000}
-              step={500}
-              tooltip='auto'
+              onChange={handleChange}
+              placeholder="Enter maximum price"
             />
           </Form.Group>
         </Col>

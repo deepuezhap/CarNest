@@ -38,11 +38,21 @@ const CreateCar = () => {
   const navigate = useNavigate();
   const [searchResults, setSearchResults] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState({ lat: "", lon: "" });
-  
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, []);
+
   const handleLocationChange = async (e) => {
     const query = e.target.value;
     setNewCar((prevCar) => ({ ...prevCar, location: query }));
-  
+
     if (query.length > 2) {
       try {
         const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
@@ -60,10 +70,10 @@ const CreateCar = () => {
       setSearchResults([]);
     }
   };
-  
+
   const handleSelectLocation = (location) => {
     const cityName = location.address.city || location.address.town || location.address.village || location.display_name;
-    
+
     setNewCar((prevCar) => ({
       ...prevCar,
       location: cityName,
@@ -72,7 +82,7 @@ const CreateCar = () => {
     }));
     setSelectedLocation({ lat: location.lat, lon: location.lon });
     setSearchResults([]);
-    
+
     // Log the latitude and longitude to the console
     console.log("Selected Location:", cityName);
     console.log("Latitude:", location.lat);
@@ -91,7 +101,7 @@ const CreateCar = () => {
         });
         imageUrl = uploadResponse.data.image_url;
       }
-  
+
       // Ensure latitude and longitude are included in the payload
       const carData = {
         ...newCar,
@@ -99,10 +109,10 @@ const CreateCar = () => {
         latitude: newCar.latitude, // Ensure latitude is included
         longitude: newCar.longitude // Ensure longitude is included
       };
-  
+
       // Log the payload for debugging
       console.log("Car Data Payload:", carData);
-  
+
       await axios.post("http://localhost:8000/api/cars", carData, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -124,249 +134,254 @@ const CreateCar = () => {
     <Container className="d-flex flex-column align-items-center vh-100">
       <Card style={{ width: "100%", maxWidth: "800px" }} className="p-4 shadow mt-5">
         <h2 className="text-center">Create New Car Listing</h2>
-        {error && <Alert variant="danger" className="text-center">{error}</Alert>}
-        <Form>
-          <Form.Group className="mb-3">
-            <Form.Label>Title</Form.Label>
-            <Form.Control
-              type="text"
-              name="title"
-              value={newCar.title}
-              onChange={handleChange}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Description</Form.Label>
-            <Form.Control
-              type="text"
-              name="description"
-              value={newCar.description}
-              onChange={handleChange}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Brand</Form.Label>
-            <Form.Control
-              type="text"
-              name="brand"
-              value={newCar.brand}
-              onChange={handleChange}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Model</Form.Label>
-            <Form.Control
-              type="text"
-              name="model"
-              value={newCar.model}
-              onChange={handleChange}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Year</Form.Label>
-            <Form.Control
-              type="number"
-              name="year"
-              value={newCar.year}
-              onChange={handleChange}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Price</Form.Label>
-            <Form.Control
-              type="number"
-              name="price"
-              value={newCar.price}
-              onChange={handleChange}
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Mileage</Form.Label>
-            <Form.Control
-              type="number"
-              name="mileage"
-              value={newCar.mileage}
-              onChange={handleChange}
-            />
-          </Form.Group>
-          
-          {/* Fuel Type Dropdown */}
-          <Form.Group className="mb-3">
-            <Form.Label>Fuel Type</Form.Label>
-            <Form.Control
-              as="select"
-              name="fuel_type"
-              value={newCar.fuel_type}
-              onChange={handleChange}
-            >
-              <option value="">Select Fuel Type</option>
-              <option value="Petrol">Petrol</option>
-              <option value="Diesel">Diesel</option>
-              <option value="Electric">Electric</option>
-              <option value="Hybrid">Hybrid</option>
-            </Form.Control>
-          </Form.Group>
-          
-          {/* Transmission Dropdown */}
-          <Form.Group className="mb-3">
-            <Form.Label>Transmission</Form.Label>
-            <Form.Control
-              as="select"
-              name="transmission"
-              value={newCar.transmission}
-              onChange={handleChange}
-            >
-              <option value="">Select Transmission</option>
-              <option value="Automatic">Automatic</option>
-              <option value="Manual">Manual</option>
-            </Form.Control>
-          </Form.Group>
-          
-          {/* Insurance Status Dropdown */}
-          <Form.Group className="mb-3">
-            <Form.Label>Insurance Status</Form.Label>
-            <Form.Control
-              as="select"
-              name="insurance_status"
-              value={newCar.insurance_status}
-              onChange={handleChange}
-            >
-              <option value="">Select Insurance Status</option>
-              <option value="Insured">Insured</option>
-              <option value="Not Insured">Not Insured</option>
-            </Form.Control>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label>Location</Form.Label>
-            <Form.Control
-              type="text"
-              name="location"
-              value={newCar.location}
-              onChange={handleLocationChange}
-              placeholder="Enter location..."
-            />
-            {searchResults.length > 0 && (
-              <ListGroup className="position-absolute w-100">
-                {searchResults.map((location, index) => (
-                  <ListGroup.Item
-                    key={index}
-                    action
-                    onClick={() => handleSelectLocation(location)}
-                  >
-                    {location.display_name}
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            )}
-          </Form.Group>
-
-          <Row>
-            <Col>
+        {!isLoggedIn && <Alert variant="warning" className="text-center">Please log in to create a car listing.</Alert>}
+        {isLoggedIn && (
+          <>
+            {error && <Alert variant="danger" className="text-center">{error}</Alert>}
+            <Form>
               <Form.Group className="mb-3">
-                <Form.Check
-                  type="checkbox"
-                  label="Power Windows"
-                  name="has_power_windows"
-                  checked={newCar.has_power_windows}
-                  onChange={handleChange}
-                />
-                <Form.Check
-                  type="checkbox"
-                  label="Power Steering"
-                  name="has_power_steering"
-                  checked={newCar.has_power_steering}
-                  onChange={handleChange}
-                />
-                <Form.Check
-                  type="checkbox"
-                  label="Car History Report"
-                  name="has_car_history_report"
-                  checked={newCar.has_car_history_report}
-                  onChange={handleChange}
-                />
-                <Form.Check
-                  type="checkbox"
-                  label="Rear Parking Sensors"
-                  name="has_rear_parking_sensors"
-                  checked={newCar.has_rear_parking_sensors}
-                  onChange={handleChange}
-                />
-                <Form.Check
-                  type="checkbox"
-                  label="Central Locking"
-                  name="has_central_locking"
-                  checked={newCar.has_central_locking}
-                  onChange={handleChange}
-                />
-                <Form.Check
-                  type="checkbox"
-                  label="Air Conditioning"
-                  name="has_air_conditioning"
-                  checked={newCar.has_air_conditioning}
+                <Form.Label>Title</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="title"
+                  value={newCar.title}
                   onChange={handleChange}
                 />
               </Form.Group>
-            </Col>
-            <Col>
               <Form.Group className="mb-3">
-                <Form.Check
-                  type="checkbox"
-                  label="Reverse Camera"
-                  name="has_reverse_camera"
-                  checked={newCar.has_reverse_camera}
-                  onChange={handleChange}
-                />
-                <Form.Check
-                  type="checkbox"
-                  label="ABS"
-                  name="has_abs"
-                  checked={newCar.has_abs}
-                  onChange={handleChange}
-                />
-                <Form.Check
-                  type="checkbox"
-                  label="Fog Lamps"
-                  name="has_fog_lamps"
-                  checked={newCar.has_fog_lamps}
-                  onChange={handleChange}
-                />
-                <Form.Check
-                  type="checkbox"
-                  label="Power Mirrors"
-                  name="has_power_mirrors"
-                  checked={newCar.has_power_mirrors}
-                  onChange={handleChange}
-                />
-                <Form.Check
-                  type="checkbox"
-                  label="GPS Navigation"
-                  name="has_gps_navigation"
-                  checked={newCar.has_gps_navigation}
-                  onChange={handleChange}
-                />
-                <Form.Check
-                  type="checkbox"
-                  label="Keyless Start"
-                  name="has_keyless_start"
-                  checked={newCar.has_keyless_start}
+                <Form.Label>Description</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="description"
+                  value={newCar.description}
                   onChange={handleChange}
                 />
               </Form.Group>
-            </Col>
-          </Row>
-          <Form.Group className="mb-3">
-            <Form.Label>Image</Form.Label>
-            <Form.Control
-              type="file"
-              name="image"
-              onChange={handleChange}
-            />
-          </Form.Group>
-        </Form>
-        <Button variant="primary" className="w-100 mt-3" onClick={handleCreateCar}>
-          Create Listing
-        </Button>
+              <Form.Group className="mb-3">
+                <Form.Label>Brand</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="brand"
+                  value={newCar.brand}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Model</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="model"
+                  value={newCar.model}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Year</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="year"
+                  value={newCar.year}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Price</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="price"
+                  value={newCar.price}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Mileage</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="mileage"
+                  value={newCar.mileage}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+              
+              {/* Fuel Type Dropdown */}
+              <Form.Group className="mb-3">
+                <Form.Label>Fuel Type</Form.Label>
+                <Form.Control
+                  as="select"
+                  name="fuel_type"
+                  value={newCar.fuel_type}
+                  onChange={handleChange}
+                >
+                  <option value="">Select Fuel Type</option>
+                  <option value="Petrol">Petrol</option>
+                  <option value="Diesel">Diesel</option>
+                  <option value="Electric">Electric</option>
+                  <option value="Hybrid">Hybrid</option>
+                </Form.Control>
+              </Form.Group>
+              
+              {/* Transmission Dropdown */}
+              <Form.Group className="mb-3">
+                <Form.Label>Transmission</Form.Label>
+                <Form.Control
+                  as="select"
+                  name="transmission"
+                  value={newCar.transmission}
+                  onChange={handleChange}
+                >
+                  <option value="">Select Transmission</option>
+                  <option value="Automatic">Automatic</option>
+                  <option value="Manual">Manual</option>
+                </Form.Control>
+              </Form.Group>
+              
+              {/* Insurance Status Dropdown */}
+              <Form.Group className="mb-3">
+                <Form.Label>Insurance Status</Form.Label>
+                <Form.Control
+                  as="select"
+                  name="insurance_status"
+                  value={newCar.insurance_status}
+                  onChange={handleChange}
+                >
+                  <option value="">Select Insurance Status</option>
+                  <option value="Insured">Insured</option>
+                  <option value="Not Insured">Not Insured</option>
+                </Form.Control>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Location</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="location"
+                  value={newCar.location}
+                  onChange={handleLocationChange}
+                  placeholder="Enter location..."
+                />
+                {searchResults.length > 0 && (
+                  <ListGroup className="position-absolute w-100">
+                    {searchResults.map((location, index) => (
+                      <ListGroup.Item
+                        key={index}
+                        action
+                        onClick={() => handleSelectLocation(location)}
+                      >
+                        {location.display_name}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                )}
+              </Form.Group>
+
+              <Row>
+                <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Check
+                      type="checkbox"
+                      label="Power Windows"
+                      name="has_power_windows"
+                      checked={newCar.has_power_windows}
+                      onChange={handleChange}
+                    />
+                    <Form.Check
+                      type="checkbox"
+                      label="Power Steering"
+                      name="has_power_steering"
+                      checked={newCar.has_power_steering}
+                      onChange={handleChange}
+                    />
+                    <Form.Check
+                      type="checkbox"
+                      label="Car History Report"
+                      name="has_car_history_report"
+                      checked={newCar.has_car_history_report}
+                      onChange={handleChange}
+                    />
+                    <Form.Check
+                      type="checkbox"
+                      label="Rear Parking Sensors"
+                      name="has_rear_parking_sensors"
+                      checked={newCar.has_rear_parking_sensors}
+                      onChange={handleChange}
+                    />
+                    <Form.Check
+                      type="checkbox"
+                      label="Central Locking"
+                      name="has_central_locking"
+                      checked={newCar.has_central_locking}
+                      onChange={handleChange}
+                    />
+                    <Form.Check
+                      type="checkbox"
+                      label="Air Conditioning"
+                      name="has_air_conditioning"
+                      checked={newCar.has_air_conditioning}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Check
+                      type="checkbox"
+                      label="Reverse Camera"
+                      name="has_reverse_camera"
+                      checked={newCar.has_reverse_camera}
+                      onChange={handleChange}
+                    />
+                    <Form.Check
+                      type="checkbox"
+                      label="ABS"
+                      name="has_abs"
+                      checked={newCar.has_abs}
+                      onChange={handleChange}
+                    />
+                    <Form.Check
+                      type="checkbox"
+                      label="Fog Lamps"
+                      name="has_fog_lamps"
+                      checked={newCar.has_fog_lamps}
+                      onChange={handleChange}
+                    />
+                    <Form.Check
+                      type="checkbox"
+                      label="Power Mirrors"
+                      name="has_power_mirrors"
+                      checked={newCar.has_power_mirrors}
+                      onChange={handleChange}
+                    />
+                    <Form.Check
+                      type="checkbox"
+                      label="GPS Navigation"
+                      name="has_gps_navigation"
+                      checked={newCar.has_gps_navigation}
+                      onChange={handleChange}
+                    />
+                    <Form.Check
+                      type="checkbox"
+                      label="Keyless Start"
+                      name="has_keyless_start"
+                      checked={newCar.has_keyless_start}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Form.Group className="mb-3">
+                <Form.Label>Image</Form.Label>
+                <Form.Control
+                  type="file"
+                  name="image"
+                  onChange={handleChange}
+                />
+              </Form.Group>
+            </Form>
+            <Button variant="primary" className="w-100 mt-3" onClick={handleCreateCar}>
+              Create Listing
+            </Button>
+          </>
+        )}
       </Card>
     </Container>
   );

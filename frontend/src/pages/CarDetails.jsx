@@ -19,7 +19,7 @@ const CarDetails = () => {
     const fetchCarDetails = async () => {
       const token = localStorage.getItem("token");
         if (!token) {
-          setError("No token found, please sign in.");
+          setError("Please sign in.");
           setLoading(false);
           return;
         }

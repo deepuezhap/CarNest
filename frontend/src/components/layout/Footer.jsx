@@ -34,20 +34,11 @@ const Footer = () => {
               <li><a href="#" className="text-white">Privacy Policy</a></li>
             </ul>
           </Col>
-          <Col md={3}>
-            <h5>Subscribe</h5>
-            <p>Get the latest car listings and offers</p>
-            <Form>
-              <Form.Group>
-                <Form.Control type="email" placeholder="Your email" />
-              </Form.Group>
-              <Button variant="primary" className="mt-2">Subscribe</Button>
-            </Form>
-          </Col>
+         
         </Row>
         <hr className="my-4" />
         <div className="text-center">
-          <small>&copy; {new Date().getFullYear()} CarMarket. All Rights Reserved.</small>
+          <small>&copy; {new Date().getFullYear()} CarNest. All Rights Reserved.</small>
         </div>
       </Container>
     </footer>

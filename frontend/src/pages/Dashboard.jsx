@@ -48,10 +48,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
+  
 
   const handleDeleteCar = async (carId) => {
     const token = localStorage.getItem("token");
@@ -78,59 +75,66 @@ const Dashboard = () => {
   };
 
   return (
-    <>
-    <NavbarComponent/>
-    <Container className="d-flex flex-column align-items-center vh-100">
-      <Card style={{ width: "100%", maxWidth: "800px" }} className="p-4 shadow mt-5">
-        <h2 className="text-center">Dashboard</h2>
+  <>
+    <NavbarComponent />
+    <Container className="d-flex flex-column align-items-center vh-100 mt-5 mb-5">
+      <h2 className="text-center">Dashboard</h2>
 
-        {loading ? (
-          <Spinner animation="border" className="d-block mx-auto" />
-        ) : error ? (
-          <Alert variant="danger" className="text-center">{error}</Alert>
-        ) : (
-          <>
-            <Alert variant="success" className="text-center">{content}</Alert>
-            <Button variant="primary" className="mb-3" onClick={() => navigate("/create-car")}>
-              Create New Car Listing
-            </Button>
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Price</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+      {loading ? (
+        <Spinner animation="border" className="d-block mx-auto" />
+      ) : error ? (
+        <Alert variant="danger" className="text-center">{error}</Alert>
+      ) : (
+        <>
+          <Alert variant="success" className="text-center">{content}</Alert>
+          <Button variant="primary" className="mb-3" onClick={() => navigate("/create-car")}>
+            Create New Car Listing
+          </Button>
+          <Table striped bordered hover >
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Year</th>
+                <th>Price</th>
+                
+                <th>Location</th>
+                
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cars.map(car => (
+                <tr key={car.id}>
+                  <td><img src={car.image_path} alt={car.title} style={{ width: "100px", height: "auto" }} /></td>
+                  <td>{car.title}</td>
+                  <td>{car.brand}</td>
+                  <td>{car.model}</td>
+                  <td>{car.year}</td>
+                  <td>${car.price}</td>
+                  
+                  <td>{car.location}</td>
+                 
+                  <td>
+                    <Button variant="success" className="me-2" onClick={() => handleMarkAsSold(car.id)} disabled={car.sold}>
+                      Mark as Sold
+                    </Button>
+                    <Button variant="danger" onClick={() => handleDeleteCar(car.id)}>
+                      Delete
+                    </Button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {cars.map(car => (
-                  <tr key={car.id}>
-                    <td>{car.title}</td>
-                    <td>${car.price}</td>
-                    <td>{car.sold ? "Sold" : "Available"}</td>
-                    <td>
-                      <Button variant="success" className="me-2" onClick={() => handleMarkAsSold(car.id)} disabled={car.sold}>
-                        Mark as Sold
-                      </Button>
-                      <Button variant="danger" onClick={() => handleDeleteCar(car.id)}>
-                        Delete
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </>
-        )}
+              ))}
+            </tbody>
+          </Table>
+        </>
+      )}
 
-        <Button variant="danger" className="w-100 mt-3" onClick={handleLogout}>
-          Logout
-        </Button>
-      </Card>
+      
     </Container>
-    </>
-  );
-};
-
+  </>
+);
+}
 export default Dashboard;

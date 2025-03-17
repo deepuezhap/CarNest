@@ -120,8 +120,8 @@ const CompareCars = () => {
                 <tbody>
                   <tr>
                     <td>Image</td>
-                    <td><Image src={selectedCar1.image_path} thumbnail /></td>
-                    <td><Image src={selectedCar2.image_path} thumbnail /></td>
+                    <td><Image src={selectedCar1.image_path }  thumbnail style={{ width: '300px', height: 'auto'}}/></td>
+                    <td><Image src={selectedCar2.image_path} thumbnail style={{ width: '300px', height: 'auto'}} /></td>
                   </tr>
                   <tr>
                     <td>Brand</td>

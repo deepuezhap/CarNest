@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Container, Card, Spinner, Alert, Form, Row, Col } from "react-bootstrap";
+import { Container, Spinner, Alert, Form, Row, Col, Table, Image } from "react-bootstrap";
 import NavbarComponent from "../components/layout/NavbarComponent";
 
 const CompareCars = () => {
@@ -63,6 +63,8 @@ const CompareCars = () => {
     }
   };
 
+  const renderBoolean = (value) => (value ? '✔️' : '❌');
+
   return (
     <>
       <NavbarComponent />
@@ -107,74 +109,137 @@ const CompareCars = () => {
             </Form>
 
             {selectedCar1 && selectedCar2 && (
-              <Row className="mt-5">
-                <Col>
-                  <Card>
-                    <Card.Img variant="top" src={selectedCar1.image_path} />
-                    <Card.Body>
-                      <Card.Title>{selectedCar1.title}</Card.Title>
-                      <Card.Text>
-                        <strong>Brand:</strong> {selectedCar1.brand}<br />
-                        <strong>Model:</strong> {selectedCar1.model}<br />
-                        <strong>Year:</strong> {selectedCar1.year}<br />
-                        <strong>Price:</strong> ${selectedCar1.price}<br />
-                        <strong>Mileage:</strong> {selectedCar1.mileage} km<br />
-                        <strong>Fuel Type:</strong> {selectedCar1.fuel_type}<br />
-                        <strong>Transmission:</strong> {selectedCar1.transmission}<br />
-                        <strong>Location:</strong> {selectedCar1.location}<br />
-                        <strong>Power Windows:</strong> {selectedCar1.has_power_windows ? 'Yes' : 'No'}<br />
-                        <strong>Power Steering:</strong> {selectedCar1.has_power_steering ? 'Yes' : 'No'}<br />
-                        <strong>Previous Owners:</strong> {selectedCar1.num_previous_owners}<br />
-                        <strong>Insurance Status:</strong> {selectedCar1.insurance_status}<br />
-                        <strong>Registration Location:</strong> {selectedCar1.registration_location}<br />
-                        <strong>Car History Report:</strong> {selectedCar1.has_car_history_report ? 'Yes' : 'No'}<br />
-                        <strong>Rear Parking Sensors:</strong> {selectedCar1.has_rear_parking_sensors ? 'Yes' : 'No'}<br />
-                        <strong>Central Locking:</strong> {selectedCar1.has_central_locking ? 'Yes' : 'No'}<br />
-                        <strong>Air Conditioning:</strong> {selectedCar1.has_air_conditioning ? 'Yes' : 'No'}<br />
-                        <strong>Reverse Camera:</strong> {selectedCar1.has_reverse_camera ? 'Yes' : 'No'}<br />
-                        <strong>ABS:</strong> {selectedCar1.has_abs ? 'Yes' : 'No'}<br />
-                        <strong>Fog Lamps:</strong> {selectedCar1.has_fog_lamps ? 'Yes' : 'No'}<br />
-                        <strong>Power Mirrors:</strong> {selectedCar1.has_power_mirrors ? 'Yes' : 'No'}<br />
-                        <strong>GPS Navigation:</strong> {selectedCar1.has_gps_navigation ? 'Yes' : 'No'}<br />
-                        <strong>Keyless Start:</strong> {selectedCar1.has_keyless_start ? 'Yes' : 'No'}<br />
-                      </Card.Text>
-                    </Card.Body>
-                  </Card>
-                </Col>
-                <Col>
-                  <Card>
-                    <Card.Img variant="top" src={selectedCar2.image_path} />
-                    <Card.Body>
-                      <Card.Title>{selectedCar2.title}</Card.Title>
-                      <Card.Text>
-                        <strong>Brand:</strong> {selectedCar2.brand}<br />
-                        <strong>Model:</strong> {selectedCar2.model}<br />
-                        <strong>Year:</strong> {selectedCar2.year}<br />
-                        <strong>Price:</strong> ${selectedCar2.price}<br />
-                        <strong>Mileage:</strong> {selectedCar2.mileage} km<br />
-                        <strong>Fuel Type:</strong> {selectedCar2.fuel_type}<br />
-                        <strong>Transmission:</strong> {selectedCar2.transmission}<br />
-                        <strong>Location:</strong> {selectedCar2.location}<br />
-                        <strong>Power Windows:</strong> {selectedCar2.has_power_windows ? 'Yes' : 'No'}<br />
-                        <strong>Power Steering:</strong> {selectedCar2.has_power_steering ? 'Yes' : 'No'}<br />
-                        <strong>Previous Owners:</strong> {selectedCar2.num_previous_owners}<br />
-                        <strong>Insurance Status:</strong> {selectedCar2.insurance_status}<br />
-                        <strong>Registration Location:</strong> {selectedCar2.registration_location}<br />
-                        <strong>Car History Report:</strong> {selectedCar2.has_car_history_report ? 'Yes' : 'No'}<br />
-                        <strong>Rear Parking Sensors:</strong> {selectedCar2.has_rear_parking_sensors ? 'Yes' : 'No'}<br />
-                        <strong>Central Locking:</strong> {selectedCar2.has_central_locking ? 'Yes' : 'No'}<br />
-                        <strong>Air Conditioning:</strong> {selectedCar2.has_air_conditioning ? 'Yes' : 'No'}<br />
-                        <strong>Reverse Camera:</strong> {selectedCar2.has_reverse_camera ? 'Yes' : 'No'}<br />
-                        <strong>ABS:</strong> {selectedCar2.has_abs ? 'Yes' : 'No'}<br />
-                        <strong>Fog Lamps:</strong> {selectedCar2.has_fog_lamps ? 'Yes' : 'No'}<br />
-                        <strong>Power Mirrors:</strong> {selectedCar2.has_power_mirrors ? 'Yes' : 'No'}<br />
-                        <strong>GPS Navigation:</strong> {selectedCar2.has_gps_navigation ? 'Yes' : 'No'}<br />
-                        <strong>Keyless Start:</strong> {selectedCar2.has_keyless_start ? 'Yes' : 'No'}<br />
-                      </Card.Text>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </Row>
+              <Table striped bordered hover className="mt-5">
+                <thead>
+                  <tr>
+                    <th>Attribute</th>
+                    <th>Car 1</th>
+                    <th>Car 2</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Image</td>
+                    <td><Image src={selectedCar1.image_path} thumbnail /></td>
+                    <td><Image src={selectedCar2.image_path} thumbnail /></td>
+                  </tr>
+                  <tr>
+                    <td>Brand</td>
+                    <td>{selectedCar1.brand}</td>
+                    <td>{selectedCar2.brand}</td>
+                  </tr>
+                  <tr>
+                    <td>Model</td>
+                    <td>{selectedCar1.model}</td>
+                    <td>{selectedCar2.model}</td>
+                  </tr>
+                  <tr>
+                    <td>Year</td>
+                    <td>{selectedCar1.year}</td>
+                    <td>{selectedCar2.year}</td>
+                  </tr>
+                  <tr>
+                    <td>Price</td>
+                    <td>${selectedCar1.price}</td>
+                    <td>${selectedCar2.price}</td>
+                  </tr>
+                  <tr>
+                    <td>Mileage</td>
+                    <td>{selectedCar1.mileage} km</td>
+                    <td>{selectedCar2.mileage} km</td>
+                  </tr>
+                  <tr>
+                    <td>Fuel Type</td>
+                    <td>{selectedCar1.fuel_type}</td>
+                    <td>{selectedCar2.fuel_type}</td>
+                  </tr>
+                  <tr>
+                    <td>Transmission</td>
+                    <td>{selectedCar1.transmission}</td>
+                    <td>{selectedCar2.transmission}</td>
+                  </tr>
+                  <tr>
+                    <td>Location</td>
+                    <td>{selectedCar1.location}</td>
+                    <td>{selectedCar2.location}</td>
+                  </tr>
+                  <tr>
+                    <td>Power Windows</td>
+                    <td>{renderBoolean(selectedCar1.has_power_windows)}</td>
+                    <td>{renderBoolean(selectedCar2.has_power_windows)}</td>
+                  </tr>
+                  <tr>
+                    <td>Power Steering</td>
+                    <td>{renderBoolean(selectedCar1.has_power_steering)}</td>
+                    <td>{renderBoolean(selectedCar2.has_power_steering)}</td>
+                  </tr>
+                  <tr>
+                    <td>Previous Owners</td>
+                    <td>{selectedCar1.num_previous_owners}</td>
+                    <td>{selectedCar2.num_previous_owners}</td>
+                  </tr>
+                  <tr>
+                    <td>Insurance Status</td>
+                    <td>{selectedCar1.insurance_status}</td>
+                    <td>{selectedCar2.insurance_status}</td>
+                  </tr>
+                  <tr>
+                    <td>Registration Location</td>
+                    <td>{selectedCar1.registration_location}</td>
+                    <td>{selectedCar2.registration_location}</td>
+                  </tr>
+                  <tr>
+                    <td>Car History Report</td>
+                    <td>{renderBoolean(selectedCar1.has_car_history_report)}</td>
+                    <td>{renderBoolean(selectedCar2.has_car_history_report)}</td>
+                  </tr>
+                  <tr>
+                    <td>Rear Parking Sensors</td>
+                    <td>{renderBoolean(selectedCar1.has_rear_parking_sensors)}</td>
+                    <td>{renderBoolean(selectedCar2.has_rear_parking_sensors)}</td>
+                  </tr>
+                  <tr>
+                    <td>Central Locking</td>
+                    <td>{renderBoolean(selectedCar1.has_central_locking)}</td>
+                    <td>{renderBoolean(selectedCar2.has_central_locking)}</td>
+                  </tr>
+                  <tr>
+                    <td>Air Conditioning</td>
+                    <td>{renderBoolean(selectedCar1.has_air_conditioning)}</td>
+                    <td>{renderBoolean(selectedCar2.has_air_conditioning)}</td>
+                  </tr>
+                  <tr>
+                    <td>Reverse Camera</td>
+                    <td>{renderBoolean(selectedCar1.has_reverse_camera)}</td>
+                    <td>{renderBoolean(selectedCar2.has_reverse_camera)}</td>
+                  </tr>
+                  <tr>
+                    <td>ABS</td>
+                    <td>{renderBoolean(selectedCar1.has_abs)}</td>
+                    <td>{renderBoolean(selectedCar2.has_abs)}</td>
+                  </tr>
+                  <tr>
+                    <td>Fog Lamps</td>
+                    <td>{renderBoolean(selectedCar1.has_fog_lamps)}</td>
+                    <td>{renderBoolean(selectedCar2.has_fog_lamps)}</td>
+                  </tr>
+                  <tr>
+                    <td>Power Mirrors</td>
+                    <td>{renderBoolean(selectedCar1.has_power_mirrors)}</td>
+                    <td>{renderBoolean(selectedCar2.has_power_mirrors)}</td>
+                  </tr>
+                  <tr>
+                    <td>GPS Navigation</td>
+                    <td>{renderBoolean(selectedCar1.has_gps_navigation)}</td>
+                    <td>{renderBoolean(selectedCar2.has_gps_navigation)}</td>
+                  </tr>
+                  <tr>
+                    <td>Keyless Start</td>
+                    <td>{renderBoolean(selectedCar1.has_keyless_start)}</td>
+                    <td>{renderBoolean(selectedCar2.has_keyless_start)}</td>
+                  </tr>
+                </tbody>
+              </Table>
             )}
           </>
         )}

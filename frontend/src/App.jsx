@@ -7,7 +7,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import CreateCar from "./pages/CreateCar";
 import CompareCars from "./pages/CompareCars";
-import ChatList from "./components/chat/ChatList";
+import ChatPage from "./pages/ChatPage";
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/create-car" element={<CreateCar />} />
       <Route path="/compare" element={<CompareCars />} />
-      <Route path="/chatpage" element={<ChatList />} />
+      <Route path="/chatpage" element={<ChatPage />} />
       <Route path="/cars/:id" element={<CarDetails />} /> {/* Add CarDetails route */}
       <Route path="*" element={<NotFound />} />
     </Routes>

@@ -1,24 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ChatList from "../components/chat/ChatList";
 import ChatWindow from "../components/chat/ChatWindow";
 import { Container, Row, Col, Card } from "react-bootstrap";
-import jwtDecode from "jwt-decode";
+import useAuth from "../hooks/useAuth"; // Import your custom hook
 
 const ChatPage = () => {
+  const currentUser = useAuth(); // ✅ Use custom auth hook
+  console.log("inside chat page "+currentUser);
   const [selectedChat, setSelectedChat] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token"); // Get JWT from localStorage
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setCurrentUser(decoded.username); // Extract username from token
-      } catch (error) {
-        console.error("Error decoding token:", error);
-      }
-    }
-  }, []);
 
   return (
     <Container className="mt-4">
@@ -28,16 +17,16 @@ const ChatPage = () => {
             <Card.Header as="h5">Your Chats</Card.Header>
             <Card.Body>
               {currentUser ? (
-                <ChatList currentUser={currentUser} onSelectChat={setSelectedChat} />
+                <ChatList currentUser={currentUser.username} onSelectChat={setSelectedChat} />
               ) : (
-                <p>Loading user...</p>
+                <p className="text-danger">Error: No user found. Please log in again.</p>
               )}
             </Card.Body>
           </Card>
         </Col>
         <Col md={8}>
           {selectedChat && currentUser ? (
-            <ChatWindow chatId={selectedChat} currentUser={currentUser} />
+            <ChatWindow chatId={selectedChat} currentUser={currentUser.username} />
           ) : (
             <p>Select a chat to start messaging</p>
           )}

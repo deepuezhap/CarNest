@@ -7,9 +7,15 @@ const ChatList = ({ currentUser, onSelectChat }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser) {
+      console.warn("No current user found in ChatList.");
+      return;
+    }
+
+    console.log("Fetching chats for:", currentUser); // ✅ Debugging log
 
     const unsubscribe = listenToChats(currentUser, (chatData) => {
+      console.log("Chat data received:", chatData); // ✅ Debugging log
       setChats(chatData);
       setLoading(false);
     });

@@ -42,7 +42,7 @@ const useAuth = () => {
       window.removeEventListener("storage", checkToken);
     };
   }, []);
-
+console.log(currentUser);
   return currentUser;
 };
 

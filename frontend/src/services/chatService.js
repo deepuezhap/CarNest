@@ -12,14 +12,19 @@ export const fetchChats = async (currentUser) => {
 
 // Listen for real-time chat updates
 export const listenToChats = (currentUser, callback) => {
+  console.log("Listening for chats for user:", currentUser); // ✅ Debugging log
   const chatsRef = collection(db, "chats");
   const q = query(chatsRef, where("participants", "array-contains", currentUser));
 
   return onSnapshot(q, (snapshot) => {
     const chats = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    console.log("Chats fetched:", chats); // ✅ Debugging log
     callback(chats);
+  }, (error) => {
+    console.error("Error listening to chats:", error);
   });
 };
+
 
 // Send a new message
 export const sendMessage = async (chatId, sender, text) => {

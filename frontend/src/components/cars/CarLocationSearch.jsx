@@ -3,6 +3,7 @@ import { Form, Button, Container, Row, Col, Alert, ListGroup } from "react-boots
 import api from "../../services/api";
 import CarList from "./CarList";
 import NavbarComponent from "../layout/NavbarComponent";
+import { useCallback } from "react";
 
 const LOCATIONIQ_API_KEY = "pk.a409ef8b059b17004393afcec331fb6b"; // Replace with your API key
 
@@ -16,25 +17,32 @@ const CarLocationSearch = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleLocationChange = async (event) => {
+  const handleLocationChange = useCallback((event) => {
     const query = event.target.value;
     setLocation(query);
-
+  
     if (query.length < 3) {
       setSuggestions([]);
       return;
     }
-
-    try {
-      const response = await fetch(
-        `https://api.locationiq.com/v1/autocomplete.php?key=${LOCATIONIQ_API_KEY}&q=${query}&format=json`
-      );
-      const data = await response.json();
-      setSuggestions(data);
-    } catch (err) {
-      console.error("Location autocomplete error:", err);
-    }
-  };
+  
+    clearTimeout(window.locationSearchTimeout); // Clear previous timeout
+  
+    window.locationSearchTimeout = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `https://api.locationiq.com/v1/autocomplete.php?key=${LOCATIONIQ_API_KEY}&q=${query}&format=json`
+        );
+        if (!response.ok) throw new Error("Failed to fetch locations");
+  
+        const data = await response.json();
+        setSuggestions(data);
+      } catch (err) {
+        console.error("Location autocomplete error:", err);
+      }
+    }, 500); // Delay API call by 500ms
+  }, []);
+  
 
   const handleSelectLocation = (place) => {
     setLocation(place.display_name);
@@ -58,7 +66,7 @@ const CarLocationSearch = () => {
       setCars(response.data);
     } catch (err) {
       console.error("Error fetching cars:", err);
-      setError("No cars found within the given radius.");
+      setError("No cars found within the given radius.");   //some problem
     } finally {
       setLoading(false);
     }
@@ -113,8 +121,8 @@ const CarLocationSearch = () => {
       
       
       
-        {error && <Alert variant="danger">{error}</Alert>}
-        {cars.length > 0 && <Container className="p-4 border rounded shadow mt-4"><CarList cars={cars} loading={loading} error={error} /></Container>}
+        {error && <Container className="p-4 border rounded shadow mt-4"><Alert variant="danger">No cars found within the given radius.</Alert></Container>}
+        {cars.length > 0 && <Container className="p-4 border rounded shadow mt-4"><CarList cars={cars} loading={loading} error={null} /></Container>}
     </>
   );
 };

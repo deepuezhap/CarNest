@@ -6,6 +6,7 @@ import Hero from "../components/layout/Hero";
 import CarList from "../components/cars/CarList";
 import CarFilter from "../components/cars/CarFilter"; // ✅ Import filter component
 import { useCars } from "../hooks/useCars";
+import CarImageSearch from "../components/cars/CarImageSearch";
 
 const Home = () => {
   const { cars, loading, error, updateParams } = useCars(); // Fetch cars and updateParams

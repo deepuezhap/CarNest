@@ -3,6 +3,16 @@ from models import User, Car
 from schemas import UserCreate, CarCreate
 from dependencies import get_password_hash
 from typing import Optional, List
+import torch
+import clip
+from PIL import Image
+import numpy as np
+import io
+import os
+import faiss
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model, preprocess = clip.load("ViT-B/32", device=device)
 
 
 def get_user_by_username(db: Session, username: str):
@@ -18,11 +28,41 @@ def create_user(db: Session, user: UserCreate):
 
 # Car CRUD Operations
 def create_car(db: Session, car_data: CarCreate):
-    car = Car(**car_data.model_dump())
+    # Convert Pydantic model to dictionary
+    car_dict = car_data.model_dump()
+
+    # Extract the actual file path from the image URL
+    image_url = car_dict.get("image_path")
+    if not image_url:
+        raise ValueError("Image path (URL) is required for embedding extraction")
+
+    # Convert the URL to a local file path
+    filename = os.path.basename(image_url)  # Extract "800-1986-1997.webp"
+    image_path = os.path.join("images", filename)  # Convert to "./images/800-1986-1997.webp"
+
+    try:
+        # Load image and preprocess
+        image = preprocess(Image.open(image_path)).unsqueeze(0).to(device)
+
+        # Extract embedding
+        with torch.no_grad():
+            image_features = model.encode_image(image)
+
+        # Normalize and convert to bytes
+        image_features /= image_features.norm(dim=-1, keepdim=True)
+        embedding_bytes = image_features.cpu().numpy().tobytes()
+
+    except Exception as e:
+        print(f"Error extracting embedding: {e}")
+        embedding_bytes = None  # Store as NULL if there's an error
+
+    # Create car entry with the embedding
+    car = Car(**car_dict, embedding=embedding_bytes)
     db.add(car)
     db.commit()
     db.refresh(car)
     return car
+
 
 def get_cars(db: Session):
     return db.query(Car).all()
@@ -75,3 +115,52 @@ def mark_car_as_sold(db: Session, car_id: int):
         db.commit()
         db.refresh(car)
     return car
+
+
+
+
+def search_similar_cars(db: Session, query_image_path: str, top_k: int = 5)-> List[Car]:
+    """
+    Given a query image, find the top-k most similar cars using CLIP and FAISS.
+    """
+    # Load and process query image
+    image = preprocess(Image.open(query_image_path)).unsqueeze(0).to(device)
+
+    with torch.no_grad():
+        query_embedding = model.encode_image(image)
+
+    # Normalize embedding
+    query_embedding /= query_embedding.norm(dim=-1, keepdim=True)
+    query_embedding_np = query_embedding.cpu().numpy().astype(np.float32)
+
+    # Retrieve all car embeddings from the database
+    cars = db.query(Car).filter(Car.embedding.isnot(None)).all()
+
+    if not cars:
+        return []
+
+    # Convert stored BLOB embeddings to NumPy array
+    embeddings = []
+    car_ids = []
+
+    for car in cars:
+        embedding_np = np.frombuffer(car.embedding, dtype=np.float32)
+        embeddings.append(embedding_np)
+        car_ids.append(car.id)
+
+    embeddings = np.array(embeddings, dtype=np.float32)
+
+    # Create FAISS index and add embeddings
+    index = faiss.IndexFlatIP(embeddings.shape[1])  # Inner Product (Cosine Similarity)
+    index.add(embeddings)
+
+    # Perform search
+    distances, indices = index.search(query_embedding_np, top_k)
+
+    # Get the corresponding car IDs
+    similar_car_ids = [car_ids[i] for i in indices[0]]
+
+    # Fetch car details
+    similar_cars = db.query(Car).filter(Car.id.in_(similar_car_ids)).all()
+
+    return similar_cars

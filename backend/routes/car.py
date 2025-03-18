@@ -6,6 +6,7 @@ from crud import create_car, get_car, delete_car, get_filtered_cars
 from dependencies import get_db
 import shutil
 import os
+from crud import search_similar_cars
 
 car_router = APIRouter()
 
@@ -48,3 +49,23 @@ def upload_car_image(file: UploadFile = File(...), db: Session = Depends(get_db)
     # Return accessible image path
     image_url = f"http://localhost:8000/images/{file.filename}"
     return {"image_url": image_url}
+
+@car_router.post("/search-by-image/",response_model=List[CarResponse])
+def search_by_image(file: UploadFile = File(...), db: Session = Depends(get_db), top_k: int = 5):
+    """Search for similar cars by image upload."""
+    
+    # Save the uploaded image temporarily
+    temp_image_path = f"./images/temp_{file.filename}"
+    with open(temp_image_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    # Perform search
+    similar_cars = search_similar_cars(db, temp_image_path, top_k)
+
+    # Clean up temp image after search
+    os.remove(temp_image_path)
+
+    if not similar_cars:
+        raise HTTPException(status_code=404, detail="No similar cars found")
+
+    return similar_cars  # This will return car details as JSON

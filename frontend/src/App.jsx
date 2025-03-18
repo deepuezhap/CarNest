@@ -7,6 +7,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import CreateCar from "./pages/CreateCar";
 import CompareCars from "./pages/CompareCars";
+import CarImageSearch from "./components/cars/CarImageSearch";
 
 function App() {
   return (
@@ -17,8 +18,10 @@ function App() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/create-car" element={<CreateCar />} />
       <Route path="/compare" element={<CompareCars />} />
-      <Route path="/cars/:id" element={<CarDetails />} /> {/* Add CarDetails route */}
+      <Route path="/cars/:id" element={<CarDetails />} /> 
+      <Route path="/imagesearch" element={<CarImageSearch />} /> 
       <Route path="*" element={<NotFound />} />
+
     </Routes>
   );
 }

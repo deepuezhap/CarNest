@@ -1,30 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Container, Card, Spinner, Alert, ListGroup, Row, Col } from "react-bootstrap";
 import api from "../services/api";
-import NavbarComponent from "../components/layout/NavbarComponent"; // Import NavbarComponent
-import { FaGasPump, FaCogs, FaMapMarkerAlt, FaCalendarAlt, FaTachometerAlt } from "react-icons/fa"; // Import icons
-import useAuth from "../hooks/useAuth";
+import NavbarComponent from "../components/layout/NavbarComponent";
+import { FaGasPump, FaCogs, FaMapMarkerAlt, FaCalendarAlt, FaTachometerAlt } from "react-icons/fa";
+import { Button } from "react-bootstrap";
+import { jwtDecode } from "jwt-decode";
+import { getOrCreateChat } from "../services/chatService";
 
 const CarDetails = () => {
   const { id } = useParams(); // Get the car ID from the URL
+  const navigate = useNavigate(); // Initialize navigate at the top level
   const [car, setCar] = useState(null); // State to store car details
   const [loading, setLoading] = useState(true); // State to manage loading state
   const [error, setError] = useState(null); // State to manage error state
-
-
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setCurrentUser(decoded.userId); // Assuming username is stored
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
 
     const fetchCarDetails = async () => {
-      const token = localStorage.getItem("token");
-        if (!token) {
-          setError("Please sign in.");
-          setLoading(false);
-          return;
-        }
+      if (!token) {
+        setError("Please sign in.");
+        setLoading(false);
+        return;
+      }
       try {
-
         console.log("Fetching car details with token:", token); // Debugging
   
         const response = await api.get(`/api/cars/${id}`, {
@@ -40,8 +49,26 @@ const CarDetails = () => {
     };
   
     fetchCarDetails();
-  }, []); // Depend on `currentUser`
+  }, [id]); // Added id to the dependency array
   
+  const handleSendMessage = async () => {
+    if (!currentUser || !car.seller_id) return;
+
+    try {
+      // Get or create a chat between the current user and the seller
+      // This function will either return an existing chat ID or create a new one
+      const chatId = await getOrCreateChat(currentUser, car.seller_id);
+      
+      if (chatId) {
+        // Navigate to the chat page with the specific chat ID
+        // This will open the existing chat if it exists, or the newly created one
+        navigate(`/chatpage?selectedChat=${chatId}`);
+      }
+    } catch (error) {
+      console.error("Error creating or finding chat:", error);
+      // You might want to show an error message to the user here
+    }
+  };
 
   if (loading) return <Spinner animation="border" className="d-block mx-auto mt-5" />; // Show spinner while loading
   if (error) return <Alert variant="warning" className="mt-3">{error}</Alert>; // Show error message if there's an error
@@ -140,6 +167,12 @@ const CarDetails = () => {
                   <ListGroup.Item>
                     <strong>Listed on:</strong> {new Date(car.created_at).toLocaleDateString()} {/* Display listing date */}
                   </ListGroup.Item>
+                  
+                  {currentUser !== car.seller_id && (
+                  <Button variant="primary" onClick={handleSendMessage}>
+                    Send Message
+                  </Button>
+                )}
                 </ListGroup>
               </Card.Body>
             </Card>

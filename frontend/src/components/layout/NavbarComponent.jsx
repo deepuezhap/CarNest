@@ -33,6 +33,7 @@ const NavbarComponent = () => {
             {isAuthenticated ? (
               <>
                 <Nav.Link as={Link} to="/compare">Compare Cars</Nav.Link>
+                <Nav.Link as={Link} to="/chatpage">Inbox</Nav.Link>
                 <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
                 <Button variant="outline-light" onClick={handleLogout}>Logout</Button>
               </>

@@ -36,7 +36,7 @@ const CarCard = ({ car }) => {
         </div>
         <div className="d-grid gap-2">
           <Button as={Link} to={`/cars/${id}`} variant="primary">View Details</Button> {/* Use Link for navigation */}
-  <Button variant="outline-secondary" onClick={blah}>Contact Seller</Button>
+  
         </div>
       </Card.Body>
     </Card>

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from schemas import CarCreate, CarResponse
-from crud import create_car, get_car, delete_car, get_filtered_cars
+from crud import create_car, get_car, delete_car, get_filtered_cars, search_cars_by_location
 from dependencies import get_db
 import shutil
 import os
@@ -69,3 +69,20 @@ def search_by_image(file: UploadFile = File(...), db: Session = Depends(get_db),
         raise HTTPException(status_code=404, detail="No similar cars found")
 
     return similar_cars  # This will return car details as JSON
+
+@car_router.get("/search-by-location/", response_model=List[CarResponse])
+def search_by_location(
+    latitude: float = Query(..., description="Latitude of the search location"),
+    longitude: float = Query(..., description="Longitude of the search location"),
+    radius: float = Query(10, description="Search radius in kilometers"),
+    limit: int = Query(5, description="Number of results to return"),
+    db: Session = Depends(get_db)
+):
+    """Find cars within a given radius based on latitude & longitude."""
+    
+    nearby_cars = search_cars_by_location(db, latitude, longitude, radius, limit)
+
+    if not nearby_cars:
+        raise HTTPException(status_code=404, detail="No cars found within the given radius")
+
+    return nearby_cars

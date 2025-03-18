@@ -1,16 +1,21 @@
 import React, { useState } from "react";
-import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
+import { Form, Button, Container, Row, Col, Alert, Image } from "react-bootstrap";
 import api from "../../services/api";
 import CarList from "./CarList";
 
 const CarImageSearch = () => {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [similarCars, setSimilarCars] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file)); // Create a temporary URL for preview
+    }
   };
 
   const handleSearch = async () => {
@@ -50,6 +55,11 @@ const CarImageSearch = () => {
           </Button>
         </Col>
       </Row>
+      {previewUrl && (
+        <div className="text-center mb-3">
+          <Image src={previewUrl} alt="Uploaded preview" thumbnail width={200} />
+        </div>
+      )}
       {error && <Alert variant="danger">{error}</Alert>}
       {similarCars.length > 0 && <CarList cars={similarCars} loading={loading} error={error} />}
     </Container>

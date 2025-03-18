@@ -3,6 +3,15 @@ from models import User, Car
 from schemas import UserCreate, CarCreate
 from dependencies import get_password_hash
 from typing import Optional, List
+import torch
+import clip
+from PIL import Image
+import numpy as np
+import io
+import os
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model, preprocess = clip.load("ViT-B/32", device=device)
 
 
 def get_user_by_username(db: Session, username: str):
@@ -18,11 +27,41 @@ def create_user(db: Session, user: UserCreate):
 
 # Car CRUD Operations
 def create_car(db: Session, car_data: CarCreate):
-    car = Car(**car_data.model_dump())
+    # Convert Pydantic model to dictionary
+    car_dict = car_data.model_dump()
+
+    # Extract the actual file path from the image URL
+    image_url = car_dict.get("image_path")
+    if not image_url:
+        raise ValueError("Image path (URL) is required for embedding extraction")
+
+    # Convert the URL to a local file path
+    filename = os.path.basename(image_url)  # Extract "800-1986-1997.webp"
+    image_path = os.path.join("images", filename)  # Convert to "./images/800-1986-1997.webp"
+
+    try:
+        # Load image and preprocess
+        image = preprocess(Image.open(image_path)).unsqueeze(0).to(device)
+
+        # Extract embedding
+        with torch.no_grad():
+            image_features = model.encode_image(image)
+
+        # Normalize and convert to bytes
+        image_features /= image_features.norm(dim=-1, keepdim=True)
+        embedding_bytes = image_features.cpu().numpy().tobytes()
+
+    except Exception as e:
+        print(f"Error extracting embedding: {e}")
+        embedding_bytes = None  # Store as NULL if there's an error
+
+    # Create car entry with the embedding
+    car = Car(**car_dict, embedding=embedding_bytes)
     db.add(car)
     db.commit()
     db.refresh(car)
     return car
+
 
 def get_cars(db: Session):
     return db.query(Car).all()

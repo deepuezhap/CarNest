@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Button, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import { FaTachometerAlt, FaCalendarAlt, FaGasPump, FaCogs, FaMapMarkerAlt } from 'react-icons/fa'; // Import icons
+import WhatsAppButton from './WhatsAppButton';
 
 const CarCard = ({ car }) => {
   const { 
@@ -36,7 +37,8 @@ const CarCard = ({ car }) => {
         </div>
         <div className="d-grid gap-2">
           <Button as={Link} to={`/cars/${id}`} variant="primary">View Details</Button> {/* Use Link for navigation */}
-  <Button variant="outline-secondary" onClick={blah}>Contact Seller</Button>
+          <Button variant="outline-secondary" onClick={blah}>Contact Seller</Button>
+          <WhatsAppButton phoneNumber={8547449048} message="I need assistance with my order." />  {/* Pass the phone number here as the  */}
         </div>
       </Card.Body>
     </Card>

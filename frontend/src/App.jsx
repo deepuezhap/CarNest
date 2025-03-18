@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import CreateCar from "./pages/CreateCar";
 import CompareCars from "./pages/CompareCars";
 import CarImageSearch from "./components/cars/CarImageSearch";
+import CarLocationSearch from "./components/cars/CarLocationSearch";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <Route path="/compare" element={<CompareCars />} />
       <Route path="/cars/:id" element={<CarDetails />} /> 
       <Route path="/imagesearch" element={<CarImageSearch />} /> 
+      <Route path="/locationsearch" element={<CarLocationSearch />} /> 
       <Route path="*" element={<NotFound />} />
 
     </Routes>

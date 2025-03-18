@@ -10,20 +10,20 @@ export const fetchChats = async (currentUser) => {
   return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
-// Listen for real-time chat updates
 export const listenToChats = (currentUser, callback) => {
-  console.log("Listening for chats for user:", currentUser); // ✅ Debugging log
+  console.log("Listening for chats for user:", currentUser); // ✅ Debug log
   const chatsRef = collection(db, "chats");
   const q = query(chatsRef, where("participants", "array-contains", currentUser));
 
   return onSnapshot(q, (snapshot) => {
     const chats = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    console.log("Chats fetched:", chats); // ✅ Debugging log
+    console.log("Fetched chats from Firestore:", chats); // ✅ Debug log
     callback(chats);
   }, (error) => {
     console.error("Error listening to chats:", error);
   });
 };
+
 
 
 // Send a new message
@@ -48,18 +48,18 @@ export const sendMessage = async (chatId, sender, text) => {
 export const getOrCreateChat = async (user1, user2) => {
   const chatsRef = collection(db, "chats");
 
-  // Check if a chat already exists
-  const q = query(chatsRef, where("participants", "array-contains", user1));
+  // Query for chats where either user1 or user2 is in the participants array
+  const q = query(chatsRef, where("participants", "array-contains-any", [user1, user2]));
   const querySnapshot = await getDocs(q);
 
   for (const doc of querySnapshot.docs) {
     const chat = doc.data();
-    if (chat.participants.includes(user2)) {
+    if (chat.participants.includes(user1) && chat.participants.includes(user2)) {
       return doc.id; // Return existing chat ID
     }
   }
 
-  // Create a new chat if it doesn’t exist
+  // Create a new chat if one does not exist
   const newChat = await addDoc(chatsRef, {
     participants: [user1, user2],
     lastMessage: "",
@@ -68,4 +68,5 @@ export const getOrCreateChat = async (user1, user2) => {
 
   return newChat.id;
 };
+
 

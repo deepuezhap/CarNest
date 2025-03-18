@@ -3,6 +3,7 @@ import ChatList from "../components/chat/ChatList";
 import ChatWindow from "../components/chat/ChatWindow";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import useAuth from "../hooks/useAuth"; // Import your custom hook
+import { useLocation } from "react-router-dom";
 
 const ChatPage = () => {
   const currentUser = useAuth(); // ✅ Use custom auth hook

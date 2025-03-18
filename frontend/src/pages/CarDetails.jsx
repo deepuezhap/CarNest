@@ -62,7 +62,9 @@ const CarDetails = () => {
       if (chatId) {
         // Navigate to the chat page with the specific chat ID
         // This will open the existing chat if it exists, or the newly created one
-        navigate(`/chatpage?selectedChat=${chatId}`);
+        navigate("/chatpage", { state: { selectedChat: chatId } });
+
+        
       }
     } catch (error) {
       console.error("Error creating or finding chat:", error);

@@ -3,6 +3,8 @@ import axios from "axios";
 import { Container, Card, Button, Form, ListGroup, Alert, Row, Col } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
+const LOCATIONIQ_API_KEY = "YOUR_LOCATIONIQ_API_KEY"; // Replace with your API Key
+
 const CreateCar = () => {
   const [newCar, setNewCar] = useState({
     title: "",
@@ -42,11 +44,7 @@ const CreateCar = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
+    setIsLoggedIn(!!token);
   }, []);
 
   const handleLocationChange = async (e) => {
@@ -55,11 +53,11 @@ const CreateCar = () => {
 
     if (query.length > 2) {
       try {
-        const response = await axios.get(`https://nominatim.openstreetmap.org/search`, {
+        const response = await axios.get(`https://api.locationiq.com/v1/autocomplete.php`, {
           params: {
+            key: LOCATIONIQ_API_KEY,
             q: query,
             format: "json",
-            addressdetails: 1,
           },
         });
         setSearchResults(response.data);
@@ -72,7 +70,11 @@ const CreateCar = () => {
   };
 
   const handleSelectLocation = (location) => {
-    const cityName = location.address.city || location.address.town || location.address.village || location.display_name;
+    const cityName =
+      location.address.city ||
+      location.address.town ||
+      location.address.village ||
+      location.display_name;
 
     setNewCar((prevCar) => ({
       ...prevCar,
@@ -83,7 +85,6 @@ const CreateCar = () => {
     setSelectedLocation({ lat: location.lat, lon: location.lon });
     setSearchResults([]);
 
-    // Log the latitude and longitude to the console
     console.log("Selected Location:", cityName);
     console.log("Latitude:", location.lat);
     console.log("Longitude:", location.lon);
@@ -102,15 +103,13 @@ const CreateCar = () => {
         imageUrl = uploadResponse.data.image_url;
       }
 
-      // Ensure latitude and longitude are included in the payload
       const carData = {
         ...newCar,
         image_path: imageUrl,
-        latitude: newCar.latitude, // Ensure latitude is included
-        longitude: newCar.longitude // Ensure longitude is included
+        latitude: newCar.latitude,
+        longitude: newCar.longitude
       };
 
-      // Log the payload for debugging
       console.log("Car Data Payload:", carData);
 
       await axios.post("http://localhost:8000/api/cars", carData, {
@@ -129,7 +128,6 @@ const CreateCar = () => {
       [name]: type === "checkbox" ? checked : type === "file" ? files[0] : value,
     }));
   };
-
   return (
     <Container className="d-flex flex-column align-items-center vh-100">
       <Card style={{ width: "100%", maxWidth: "800px" }} className="p-4 shadow mt-5">

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Alert, Image } from "react-bootstrap";
 import api from "../../services/api";
 import CarList from "./CarList";
+import NavbarComponent from "../layout/NavbarComponent";
 
 const CarImageSearch = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -43,6 +44,8 @@ const CarImageSearch = () => {
   };
 
   return (
+    <>
+    <NavbarComponent/>
     <Container className="p-4 border rounded shadow mt-4">
       <h3 className="mb-3">Find Similar Cars</h3>
       <Row className="mb-3">
@@ -63,6 +66,8 @@ const CarImageSearch = () => {
       {error && <Alert variant="danger">{error}</Alert>}
       {similarCars.length > 0 && <CarList cars={similarCars} loading={loading} error={error} />}
     </Container>
+    </>
+
   );
 };
 

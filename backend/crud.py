@@ -9,6 +9,7 @@ from PIL import Image
 import numpy as np
 import io
 import os
+import faiss
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", device=device)
@@ -114,3 +115,52 @@ def mark_car_as_sold(db: Session, car_id: int):
         db.commit()
         db.refresh(car)
     return car
+
+
+
+
+def search_similar_cars(db: Session, query_image_path: str, top_k: int = 5)-> List[Car]:
+    """
+    Given a query image, find the top-k most similar cars using CLIP and FAISS.
+    """
+    # Load and process query image
+    image = preprocess(Image.open(query_image_path)).unsqueeze(0).to(device)
+
+    with torch.no_grad():
+        query_embedding = model.encode_image(image)
+
+    # Normalize embedding
+    query_embedding /= query_embedding.norm(dim=-1, keepdim=True)
+    query_embedding_np = query_embedding.cpu().numpy().astype(np.float32)
+
+    # Retrieve all car embeddings from the database
+    cars = db.query(Car).filter(Car.embedding.isnot(None)).all()
+
+    if not cars:
+        return []
+
+    # Convert stored BLOB embeddings to NumPy array
+    embeddings = []
+    car_ids = []
+
+    for car in cars:
+        embedding_np = np.frombuffer(car.embedding, dtype=np.float32)
+        embeddings.append(embedding_np)
+        car_ids.append(car.id)
+
+    embeddings = np.array(embeddings, dtype=np.float32)
+
+    # Create FAISS index and add embeddings
+    index = faiss.IndexFlatIP(embeddings.shape[1])  # Inner Product (Cosine Similarity)
+    index.add(embeddings)
+
+    # Perform search
+    distances, indices = index.search(query_embedding_np, top_k)
+
+    # Get the corresponding car IDs
+    similar_car_ids = [car_ids[i] for i in indices[0]]
+
+    # Fetch car details
+    similar_cars = db.query(Car).filter(Car.id.in_(similar_car_ids)).all()
+
+    return similar_cars

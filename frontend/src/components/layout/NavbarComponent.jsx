@@ -29,6 +29,8 @@ const NavbarComponent = () => {
             <Nav.Link as={Link} to="/create-car">Sell Your Car</Nav.Link>
             <Nav.Link as={Link} to="/imagesearch">Image search</Nav.Link>
             <Nav.Link as={Link} to="/locationsearch">Location based search</Nav.Link>
+            <Nav.Link as={Link} to="/search-by-text">Semantic</Nav.Link>
+
 
 
             

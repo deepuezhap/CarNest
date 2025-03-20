@@ -18,25 +18,43 @@ model, preprocess = clip.load("ViT-B/32", device=device)
 
 # Sample data for car brands, models, fuel types, and locations
 brands_models = {
-    "Maruti Suzuki": ["Swift", "Baleno", "Alto"],
-    "Hyundai": ["i20", "Creta", "Venue"],
-    "Tata": ["Nexon", "Harrier", "Altroz"],
-    "Mahindra": ["Scorpio", "XUV500", "Thar"],
-    "Honda": ["City", "Amaze", "Jazz"],
-    "Toyota": ["Innova", "Fortuner", "Etios"],
-    "Ford": ["EcoSport", "Figo", "Endeavour"],
-    "Kia": ["Seltos", "Sonet", "Carnival"]
+    "Maruti Suzuki": ["Swift", "Baleno", "Alto", "Vitara Brezza", "Ertiga", "Celerio"],
+    "Hyundai": ["i20", "Creta", "Venue", "Verna", "Santro", "Tucson"],
+    "Tata": ["Nexon", "Harrier", "Altroz", "Tiago", "Tigor", "Safari"],
+    "Mahindra": ["Scorpio", "XUV500", "Thar", "Bolero", "Marazzo", "XUV700"],
+    "Honda": ["City", "Amaze", "Jazz", "WR-V", "Brio", "CR-V"],
+    "Toyota": ["Innova", "Fortuner", "Etios", "Glanza", "Urban Cruiser", "Corolla Altis"],
+    "Ford": ["EcoSport", "Figo", "Endeavour", "Aspire", "Focus"],
+    "Kia": ["Seltos", "Sonet", "Carnival", "Carens", "Sportege"]
 }
+
 fuel_types = ["Petrol", "Diesel", "Electric", "CNG"]
 transmissions = ["Automatic", "Manual"]
-general_locations = ["Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai", "Kolkata"]
+general_locations = [
+    "Kottayam", "Thiruvananthapuram", "Ettumanoor", "Kochi", "Alappuzha", 
+    "Calicut", "Kannur", "Idukki", "Pathanamthitta", "Wayanad", 
+    "Varkala", "Kollam", "Palakkad", "Munnar"
+]
+
 
 # Predefined locations with latitude & longitude
 specific_locations = [
-    {"location": "Kottayam, Kerala", "latitude": 9.591567, "longitude": 76.522153},
-    {"location": "Thampanoor, Thiruvananthapuram, Kerala", "latitude": 8.487045, "longitude": 76.952725},
-    {"location": "Ettumanoor, Kerala", "latitude": 9.670626, "longitude": 76.557882}
+    {"location": "Kottayam", "latitude": 9.591567, "longitude": 76.522153},
+    {"location": "Thiruvananthapuram", "latitude": 8.487045, "longitude": 76.952725},
+    {"location": "Ettumanoor", "latitude": 9.670626, "longitude": 76.557882},
+    {"location": "Kochi", "latitude": 9.931233, "longitude": 76.267304},
+    {"location": "Alappuzha", "latitude": 9.498107, "longitude": 76.338749},
+    {"location": "Calicut", "latitude": 11.2588, "longitude": 75.7804},
+    {"location": "Kannur", "latitude": 11.8745, "longitude": 75.3704},
+    {"location": "Idukki", "latitude": 9.8833, "longitude": 77.0997},
+    {"location": "Pathanamthitta", "latitude": 9.2648, "longitude": 76.7811},
+    {"location": "Wayanad", "latitude": 11.7162, "longitude": 76.1144},
+    {"location": "Varkala", "latitude": 8.7342, "longitude": 76.7128},
+    {"location": "Kollam", "latitude": 8.884, "longitude": 76.5941},
+    {"location": "Palakkad", "latitude": 10.7769, "longitude": 76.6546},
+    {"location": "Munnar", "latitude": 10.0889, "longitude": 77.0588}
 ]
+
 
 # Directory containing car images
 IMAGE_DIR = "./images/"
@@ -54,13 +72,50 @@ def extract_embedding(image_path: str):
         print(f"⚠️ Error extracting embedding for {image_path}: {e}")
         return None
 
+def generate_tags(image_path: str) -> list:
+    """Generate tags for the image using CLIP based on predefined categories."""
+    try:
+        # Categories for possible tags
+        vehicle_types = ["sedan", "SUV", "hatchback", "truck", "coupe", "convertible", "minivan", "crossover"]
+        colors = ["red", "blue", "black", "white", "green", "yellow", "silver", "gray", "brown"]
+        conditions = ["brand new", "used", "like new", "well-maintained", "slightly worn"]
+        fuel_types = ["petrol", "diesel", "electric", "CNG"]
+        other_tags = ["luxury", "sporty", "economical", "family", "off-road", "compact", "eco-friendly", "vintage", "modern"]
+
+        # Combine all categories for tags
+        all_tags = vehicle_types + colors + conditions + fuel_types + other_tags
+        text_inputs = clip.tokenize(all_tags).to(device)
+        image = preprocess(Image.open(image_path)).unsqueeze(0).to(device)
+        
+        # Get features for both the image and the text categories
+        with torch.no_grad():
+            image_features = model.encode_image(image)
+            text_features = model.encode_text(text_inputs)
+        
+        # Normalize the features
+        image_features /= image_features.norm(dim=-1, keepdim=True)
+        text_features /= text_features.norm(dim=-1, keepdim=True)
+        
+        # Compute similarity between image and text features
+        similarity = (image_features @ text_features.T).squeeze(0)
+        
+        # Get the top 5 tags (most similar)
+        top_indices = similarity.argsort(descending=True)[:5]
+        top_tags = [all_tags[i] for i in top_indices]
+
+        return top_tags
+
+    except Exception as e:
+        print(f"⚠️ Error generating tags for {image_path}: {e}")
+        return []
+
 def seed_data():
     db: Session = SessionLocal()
 
     # Create a test user if not exists
-    test_user = db.query(User).filter(User.username == "testuser").first()
+    test_user = db.query(User).filter(User.username == "admin").first()
     if not test_user:
-        test_user = User(username="testuser", email="test@example.com", hashed_password=get_password_hash("password123"))
+        test_user = User(username="admin", email="admin@example.com", hashed_password=get_password_hash("admin"))
         db.add(test_user)
         db.commit()
         db.refresh(test_user)
@@ -70,18 +125,14 @@ def seed_data():
     for i in range(1, 21):  # Generate 20 cars
         brand = random.choice(list(brands_models.keys()))
         model = random.choice(brands_models[brand])
-        year = random.randint(2015, 2024)
+        year = random.randint(2001, 2024)
         price = round(random.uniform(300000, 2000000), 2)
-        mileage = random.randint(5000, 150000)
+        mileage = random.randint(5, 26)
         fuel_type = random.choice(fuel_types)
         transmission = random.choice(transmissions)
+        loc_data = random.choice(specific_locations)
 
-        # Assign location (some with predefined latitude/longitude, others random)
-        if random.random() < 0.5:  # 50% chance to use predefined location
-            loc_data = random.choice(specific_locations)
-        else:
-            loc_data = {"location": random.choice(general_locations), "latitude": None, "longitude": None}
-
+        
         # Select a random image
         image_file = random.choice(image_files)
         image_url = f"http://localhost:8000/images/{image_file}"
@@ -89,6 +140,12 @@ def seed_data():
 
         # Extract image embedding
         embedding = extract_embedding(image_path)
+
+        # Generate tags using CLIP
+        tags = generate_tags(image_path)
+
+        # Join tags into a comma-separated string
+        tags_str = ",".join(tags)  # Convert the list of tags into a single string
 
         cars.append(Car(
             title=f"{brand} {model} {year}",
@@ -119,13 +176,14 @@ def seed_data():
             has_gps_navigation=random.choice([True, False]),
             has_keyless_start=random.choice([True, False]),
             image_path=image_url,  # Use URL for frontend display
+            tags=tags_str,  # Store the generated tags as string
             embedding=embedding  # Store CLIP embedding
         ))
 
     db.add_all(cars)
     db.commit()
     db.close()
-    print("✅ 20 test car listings added successfully with embeddings and locations!")
+    print("✅ 20 test car added.")
 
 if __name__ == "__main__":
     seed_data()

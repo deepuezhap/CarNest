@@ -8,7 +8,7 @@ const LOCATIONIQ_API_KEY = "pk.a409ef8b059b17004393afcec331fb6b"; // Replace wit
 const CreateCar = () => {
   const [newCar, setNewCar] = useState({
     title: "",
-    description: "",
+    tags: "",
     brand: "",
     model: "",
     year: "",
@@ -147,11 +147,11 @@ const CreateCar = () => {
                 />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Description</Form.Label>
+                <Form.Label>Tags</Form.Label>
                 <Form.Control
                   type="text"
-                  name="description"
-                  value={newCar.description}
+                  name="tags"
+                  value={newCar.tags}
                   onChange={handleChange}
                 />
               </Form.Group>

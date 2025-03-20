@@ -52,6 +52,14 @@ class CarResponse(CarCreate):
         # This tells Pydantic to read from attributes for ORM models (SQLAlchemy)
         from_attributes = True
 
+class CarSearchResponse(CarResponse):
+    confidence: Optional[float] = None
+
+    class Config:
+        # This tells Pydantic to read from attributes for ORM models (SQLAlchemy)
+        from_attributes = True
+
+
 class UserCreate(BaseModel):
     username: str
     email: str

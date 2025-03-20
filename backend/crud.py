@@ -158,12 +158,18 @@ def search_similar_cars(db: Session, query_image_path: str, top_k: int = 5)-> Li
 
     # Perform search
     distances, indices = index.search(query_embedding_np, top_k)
+    normalized_scores = ((distances[0] + 1) / 2) * 100
+
 
     # Get the corresponding car IDs
     similar_car_ids = [car_ids[i] for i in indices[0]]
 
     # Fetch car details
     similar_cars = db.query(Car).filter(Car.id.in_(similar_car_ids)).all()
+
+# Attach confidence scores to each car object
+    for i, car in enumerate(similar_cars):
+        car.confidence = round(normalized_scores[i], 2)  # Add confidence score to each car
 
     return similar_cars
 
@@ -234,11 +240,17 @@ def search_cars_by_text(db: Session, query_text: str, top_k: int = 5) -> List[Ca
 
     # Perform search
     distances, indices = index.search(text_embedding_np, top_k)
+    normalized_scores = ((distances[0] + 1) / 2) * 100
+
 
     # Get the corresponding car IDs
     similar_car_ids = [car_ids[i] for i in indices[0]]
 
     # Fetch car details
     similar_cars = db.query(Car).filter(Car.id.in_(similar_car_ids)).all()
+
+    # Attach confidence scores to each car object
+    for i, car in enumerate(similar_cars):
+        car.confidence = round(normalized_scores[i], 2)  # Add confidence score to each car
 
     return similar_cars

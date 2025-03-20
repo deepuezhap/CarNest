@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from schemas import  CarResponse
+from schemas import  CarResponse, CarSearchResponse
 from crud import   get_filtered_cars, search_cars_by_location, search_cars_by_text
 from dependencies import get_db
 import shutil
@@ -50,7 +50,7 @@ def upload_car_image(file: UploadFile = File(...), db: Session = Depends(get_db)
     image_url = f"http://localhost:8000/images/{file.filename}"
     return {"image_url": image_url}
 
-@car_router.post("/search-by-image/",response_model=List[CarResponse])
+@car_router.post("/search-by-image/",response_model=List[CarSearchResponse])
 def search_by_image(file: UploadFile = File(...), db: Session = Depends(get_db), top_k: int = 5):
     """Search for similar cars by image upload."""
     
@@ -87,7 +87,7 @@ def search_by_location(
 
     return nearby_cars
 
-@car_router.get("/search-by-text/", response_model=List[CarResponse])
+@car_router.get("/search-by-text/", response_model=List[CarSearchResponse])
 def search_by_text(query: str = Query(..., description="Search query"), db: Session = Depends(get_db), top_k: int = 5):
     """
     Search for cars using a text description.

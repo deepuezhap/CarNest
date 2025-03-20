@@ -10,6 +10,7 @@ import numpy as np
 import os
 import faiss
 from math import radians, cos, sin, asin, sqrt
+import re
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -209,9 +210,11 @@ def search_cars_by_text(db: Session, query_text: str, top_k: int = 5) -> List[Ca
     """
     Given a text query, find the top-k most similar cars using CLIP text-to-image search.
     """
+    cleaned_query_text=clean_text(query_text)
+
     # Encode the text query
     with torch.no_grad():
-        text_embedding = model.encode_text(clip.tokenize([query_text]).to(device))
+        text_embedding = model.encode_text(clip.tokenize([cleaned_query_text]).to(device))
 
     # Normalize embedding
     text_embedding /= text_embedding.norm(dim=-1, keepdim=True)
@@ -254,3 +257,10 @@ def search_cars_by_text(db: Session, query_text: str, top_k: int = 5) -> List[Ca
         car.confidence = float(f"{normalized_scores[i]:.2f}")  # Proper rounding to 2 decimal places
 
     return similar_cars
+
+def clean_text(text):
+    """Remove special characters and convert to lowercase for better matching."""
+    text = text.lower()
+    text = re.sub(r'[^a-z0-9 ]+', '', text)  # Remove special characters
+    return text
+

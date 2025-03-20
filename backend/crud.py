@@ -169,8 +169,8 @@ def search_similar_cars(db: Session, query_image_path: str, top_k: int = 5)-> Li
 
 # Attach confidence scores to each car object
     for i, car in enumerate(similar_cars):
-        car.confidence = round(normalized_scores[i], 2)  # Add confidence score to each car
-
+        car.confidence = float(f"{normalized_scores[i]:.2f}")  # Proper rounding to 2 decimal places
+                
     return similar_cars
 
 
@@ -251,6 +251,6 @@ def search_cars_by_text(db: Session, query_text: str, top_k: int = 5) -> List[Ca
 
     # Attach confidence scores to each car object
     for i, car in enumerate(similar_cars):
-        car.confidence = round(normalized_scores[i], 2)  # Add confidence score to each car
+        car.confidence = float(f"{normalized_scores[i]:.2f}")  # Proper rounding to 2 decimal places
 
     return similar_cars

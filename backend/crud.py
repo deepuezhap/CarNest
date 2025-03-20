@@ -198,3 +198,47 @@ def search_cars_by_location(db: Session, latitude: float, longitude: float, radi
     ]
 
     return nearby_cars[:limit]  # Limit results
+
+def search_cars_by_text(db: Session, query_text: str, top_k: int = 5) -> List[Car]:
+    """
+    Given a text query, find the top-k most similar cars using CLIP text-to-image search.
+    """
+    # Encode the text query
+    with torch.no_grad():
+        text_embedding = model.encode_text(clip.tokenize([query_text]).to(device))
+
+    # Normalize embedding
+    text_embedding /= text_embedding.norm(dim=-1, keepdim=True)
+    text_embedding_np = text_embedding.cpu().numpy().astype(np.float32)
+
+    # Retrieve all car embeddings from the database
+    cars = db.query(Car).filter(Car.embedding.isnot(None)).all()
+
+    if not cars:
+        return []
+
+    # Convert stored BLOB embeddings to NumPy array
+    embeddings = []
+    car_ids = []
+
+    for car in cars:
+        embedding_np = np.frombuffer(car.embedding, dtype=np.float32)
+        embeddings.append(embedding_np)
+        car_ids.append(car.id)
+
+    embeddings = np.array(embeddings, dtype=np.float32)
+
+    # Create FAISS index and add embeddings
+    index = faiss.IndexFlatIP(embeddings.shape[1])  # Inner Product (Cosine Similarity)
+    index.add(embeddings)
+
+    # Perform search
+    distances, indices = index.search(text_embedding_np, top_k)
+
+    # Get the corresponding car IDs
+    similar_car_ids = [car_ids[i] for i in indices[0]]
+
+    # Fetch car details
+    similar_cars = db.query(Car).filter(Car.id.in_(similar_car_ids)).all()
+
+    return similar_cars

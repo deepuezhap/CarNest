@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from schemas import CarCreate, CarResponse
-from crud import create_car, get_car, delete_car, get_filtered_cars, search_cars_by_location
+from schemas import  CarResponse
+from crud import   get_filtered_cars, search_cars_by_location, search_cars_by_text
 from dependencies import get_db
 import shutil
 import os
@@ -86,3 +86,15 @@ def search_by_location(
         raise HTTPException(status_code=404, detail="No cars found within the given radius")
 
     return nearby_cars
+
+@car_router.get("/search-by-text/", response_model=List[CarResponse])
+def search_by_text(query: str = Query(..., description="Search query"), db: Session = Depends(get_db), top_k: int = 5):
+    """
+    Search for cars using a text description.
+    """
+    similar_cars = search_cars_by_text(db, query, top_k)
+
+    if not similar_cars:
+        raise HTTPException(status_code=404, detail="No matching cars found")
+
+    return similar_cars

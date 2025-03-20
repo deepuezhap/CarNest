@@ -1,21 +1,37 @@
 import React from 'react';
 import { Card, Button, Badge } from 'react-bootstrap';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
-import { FaTachometerAlt, FaCalendarAlt, FaGasPump, FaCogs, FaMapMarkerAlt } from 'react-icons/fa'; // Import icons
+import { Link } from 'react-router-dom';
+import { FaTachometerAlt, FaCalendarAlt, FaGasPump, FaCogs, FaMapMarkerAlt } from 'react-icons/fa';
+import { BsStars } from 'react-icons/bs';
 import WhatsAppButton from './WhatsAppButton';
 
 const CarCard = ({ car }) => {
   const { 
     id, title, price, mileage, year, fuel_type,
-    transmission, image_path, location, seller_id 
+    transmission, image_path, location, seller_id, confidence
   } = car;
-  const blah = ()=>console.log(seller_id);
+
+  // Determine confidence badge color
+  const getConfidenceBadge = (confidence) => {
+    if (confidence >= 80) return "success"; // Green ✅
+    if (confidence >= 50) return "warning"; // Yellow ⚠️
+    return "danger"; // Red ❌
+  };
+
   return (
     <Card>
-      <Card.Img variant="top" src={image_path} alt={title} style={{ width: "100%", height: "200px", objectFit: "cover" }} /> {/* Display car image */}
+      <Card.Img variant="top" src={image_path} alt={title} style={{ width: "100%", height: "200px", objectFit: "cover" }} /> 
       <Card.Body>
         <Card.Title>{title}</Card.Title>
         <Card.Text className="text-primary fw-bold fs-4">${price.toLocaleString()}</Card.Text>
+        
+        {/* Show Confidence Badge Only If `confidence` Exists */}
+        {confidence !== undefined && (
+          <Badge pill bg={getConfidenceBadge(confidence)} className="mb-2">
+            <BsStars className="me-1" /> {confidence}% Match
+          </Badge>
+        )}
+
         <div className="d-flex mb-3 text-muted small">
           <div className="me-3">
             <FaTachometerAlt className="me-1" /> {mileage.toLocaleString()} miles
@@ -36,9 +52,9 @@ const CarCard = ({ car }) => {
           </div>
         </div>
         <div className="d-grid gap-2">
-          <Button as={Link} to={`/cars/${id}`} variant="primary">View Details</Button> {/* Use Link for navigation */}
-          <Button variant="outline-secondary" onClick={blah}>Contact Seller</Button>
-          <WhatsAppButton phoneNumber={8547449048} message="I need assistance with my order." />  {/* Pass the phone number here as the  */}
+          <Button as={Link} to={`/cars/${id}`} variant="primary">View Details</Button> 
+          <Button variant="outline-secondary" onClick={() => console.log(seller_id)}>Contact Seller</Button>
+          <WhatsAppButton phoneNumber={8547449048} message="I need assistance with my order." />  
         </div>
       </Card.Body>
     </Card>

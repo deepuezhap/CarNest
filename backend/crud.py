@@ -80,32 +80,103 @@ def delete_car(db: Session, car_id: int):
 
 def get_filtered_cars(
     db: Session,
+    title: Optional[str] = None,
+    tags: Optional[str] = None,
     brand: Optional[str] = None,
     model: Optional[str] = None,
+    year: Optional[int] = None,
     min_price: Optional[float] = None,
     max_price: Optional[float] = None,
+    min_mileage: Optional[float] = None,
+    max_mileage: Optional[float] = None,
     fuel_type: Optional[str] = None,
     transmission: Optional[str] = None,
+    location: Optional[str] = None,
+    num_previous_owners: Optional[int] = None,
+    insurance_status: Optional[str] = None,
+    registration_location: Optional[str] = None,
+    has_power_windows: Optional[bool] = None,
+    has_power_steering: Optional[bool] = None,
+    has_car_history_report: Optional[bool] = None,
+    has_rear_parking_sensors: Optional[bool] = None,
+    has_central_locking: Optional[bool] = None,
+    has_air_conditioning: Optional[bool] = None,
+    has_reverse_camera: Optional[bool] = None,
+    has_abs: Optional[bool] = None,
+    has_fog_lamps: Optional[bool] = None,
+    has_power_mirrors: Optional[bool] = None,
+    has_gps_navigation: Optional[bool] = None,
+    has_keyless_start: Optional[bool] = None,
     limit: int = 10,
     offset: int = 0
 ) -> List[Car]:
-    query = db.query(Car).filter(Car.sold == False)  # Filter out sold cars
+    query = db.query(Car).filter(Car.sold == False)  # Exclude sold cars
 
+    # String-based filters
+    if title:
+        query = query.filter(Car.title.ilike(f"%{title}%"))
+    if tags:
+        query = query.filter(Car.tags.ilike(f"%{tags}%"))
     if brand:
         query = query.filter(Car.brand.ilike(f"%{brand}%"))
     if model:
         query = query.filter(Car.model.ilike(f"%{model}%"))
+    if location:
+        query = query.filter(Car.location.ilike(f"%{location}%"))
+    if registration_location:
+        query = query.filter(Car.registration_location.ilike(f"%{registration_location}%"))
+    
+    # Numeric filters
+    if year is not None:
+        query = query.filter(Car.year == year)
     if min_price is not None:
         query = query.filter(Car.price >= min_price)
     if max_price is not None:
         query = query.filter(Car.price <= max_price)
+    if min_mileage is not None:
+        query = query.filter(Car.mileage >= min_mileage)
+    if max_mileage is not None:
+        query = query.filter(Car.mileage <= max_mileage)
+    if num_previous_owners is not None:
+        query = query.filter(Car.num_previous_owners == num_previous_owners)
+
+    # Exact match filters
     if fuel_type:
         query = query.filter(Car.fuel_type == fuel_type)
     if transmission:
         query = query.filter(Car.transmission == transmission)
+    if insurance_status:
+        query = query.filter(Car.insurance_status == insurance_status)
 
-    # Apply pagination at the END
+    # Boolean feature filters
+    if has_power_windows is not None:
+        query = query.filter(Car.has_power_windows == has_power_windows)
+    if has_power_steering is not None:
+        query = query.filter(Car.has_power_steering == has_power_steering)
+    if has_car_history_report is not None:
+        query = query.filter(Car.has_car_history_report == has_car_history_report)
+    if has_rear_parking_sensors is not None:
+        query = query.filter(Car.has_rear_parking_sensors == has_rear_parking_sensors)
+    if has_central_locking is not None:
+        query = query.filter(Car.has_central_locking == has_central_locking)
+    if has_air_conditioning is not None:
+        query = query.filter(Car.has_air_conditioning == has_air_conditioning)
+    if has_reverse_camera is not None:
+        query = query.filter(Car.has_reverse_camera == has_reverse_camera)
+    if has_abs is not None:
+        query = query.filter(Car.has_abs == has_abs)
+    if has_fog_lamps is not None:
+        query = query.filter(Car.has_fog_lamps == has_fog_lamps)
+    if has_power_mirrors is not None:
+        query = query.filter(Car.has_power_mirrors == has_power_mirrors)
+    if has_gps_navigation is not None:
+        query = query.filter(Car.has_gps_navigation == has_gps_navigation)
+    if has_keyless_start is not None:
+        query = query.filter(Car.has_keyless_start == has_keyless_start)
+
+    # Apply pagination at the end
     return query.offset(offset).limit(limit).all()
+
 
 def get_user_cars(db: Session, user_id: int) -> List[Car]:
     return db.query(Car).filter(Car.seller_id == user_id).all()

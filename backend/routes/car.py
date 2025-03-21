@@ -16,21 +16,49 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)  # Ensure directory exists
 @car_router.get("/", response_model=List[CarResponse])
 def fetch_cars(
     db: Session = Depends(get_db),
-    brand: Optional[str] = Query(None, description="Filter by car brand"),
-    model: Optional[str] = Query(None, description="Filter by car model"),
+    title: Optional[str] = Query(None, description="Search by title"),
+    tags: Optional[str] = Query(None, description="Search by tags"),
+    brand: Optional[str] = Query(None, description="Filter by brand"),
+    model: Optional[str] = Query(None, description="Filter by model"),
+    year: Optional[int] = Query(None, description="Filter by year"),
     min_price: Optional[float] = Query(None, description="Minimum price"),
     max_price: Optional[float] = Query(None, description="Maximum price"),
+    min_mileage: Optional[float] = Query(None, description="Minimum mileage"),
+    max_mileage: Optional[float] = Query(None, description="Maximum mileage"),
     fuel_type: Optional[str] = Query(None, description="Filter by fuel type"),
     transmission: Optional[str] = Query(None, description="Filter by transmission type"),
+    location: Optional[str] = Query(None, description="Filter by location"),
+    num_previous_owners: Optional[int] = Query(None, description="Filter by number of previous owners"),
+    insurance_status: Optional[str] = Query(None, description="Filter by insurance status"),
+    registration_location: Optional[str] = Query(None, description="Filter by registration location"),
+    has_power_windows: Optional[bool] = Query(None, description="Has Power Windows"),
+    has_power_steering: Optional[bool] = Query(None, description="Has Power Steering"),
+    has_car_history_report: Optional[bool] = Query(None, description="Has Car History Report"),
+    has_rear_parking_sensors: Optional[bool] = Query(None, description="Has Rear Parking Sensors"),
+    has_central_locking: Optional[bool] = Query(None, description="Has Central Locking"),
+    has_air_conditioning: Optional[bool] = Query(None, description="Has Air Conditioning"),
+    has_reverse_camera: Optional[bool] = Query(None, description="Has Reverse Camera"),
+    has_abs: Optional[bool] = Query(None, description="Has ABS"),
+    has_fog_lamps: Optional[bool] = Query(None, description="Has Fog Lamps"),
+    has_power_mirrors: Optional[bool] = Query(None, description="Has Power Mirrors"),
+    has_gps_navigation: Optional[bool] = Query(None, description="Has GPS Navigation"),
+    has_keyless_start: Optional[bool] = Query(None, description="Has Keyless Start"),
     limit: int = Query(10, description="Number of results per page"),
     offset: int = Query(0, description="Starting index for pagination"),
 ):
-    cars = get_filtered_cars(db, brand, model, min_price, max_price, fuel_type, transmission, limit, offset)
+    cars = get_filtered_cars(
+        db, title, tags, brand, model, year, min_price, max_price, min_mileage, max_mileage,
+        fuel_type, transmission, location, num_previous_owners, insurance_status, registration_location,
+        has_power_windows, has_power_steering, has_car_history_report, has_rear_parking_sensors,
+        has_central_locking, has_air_conditioning, has_reverse_camera, has_abs, has_fog_lamps,
+        has_power_mirrors, has_gps_navigation, has_keyless_start, limit, offset
+    )
     
     if not cars:
         raise HTTPException(status_code=404, detail="No cars found with the given filters")
     
     return cars
+
 
 @car_router.post("/upload-image/")
 def upload_car_image(file: UploadFile = File(...), db: Session = Depends(get_db)):

@@ -27,15 +27,13 @@ class Car(Base):
     fuel_type = Column(String)
     transmission = Column(String)
     location = Column(String)
-    latitude = Column(Float)  # For proximity search
-    longitude = Column(Float) # For proximity search
     image_path = Column(String, nullable=False)  # Store image location
-    embedding = Column(LargeBinary, nullable=True)  # Store CLIP embedding
-    has_power_windows = Column(Boolean, default=False)
-    has_power_steering = Column(Boolean, default=False)
+    embedding = Column(LargeBinary, nullable=True)  # Store CLIP embedding 
     num_previous_owners = Column(Integer, default=0)
     insurance_status = Column(String, nullable=True)  # "Comprehensive" / "Third-party" / None
     registration_location = Column(String, nullable=True)
+
+    # Additional features
     has_car_history_report = Column(Boolean, default=False)  #
     has_rear_parking_sensors = Column(Boolean, default=False)
     has_central_locking = Column(Boolean, default=False)
@@ -46,10 +44,15 @@ class Car(Base):
     has_power_mirrors = Column(Boolean, default=False)
     has_gps_navigation = Column(Boolean, default=False)
     has_keyless_start = Column(Boolean, default=False)
+    has_power_windows = Column(Boolean, default=False)
+    has_power_steering = Column(Boolean, default=False)
 
+
+
+    latitude = Column(Float)  # For proximity search
+    longitude = Column(Float) # For proximity search
     seller_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-
     sold = Column(Boolean, default=False)
 
     seller = relationship("User", back_populates="cars")

@@ -5,7 +5,7 @@ from models import User
 from .auth import get_current_user
 from sqlalchemy.orm import Session
 from dependencies import get_db
-from crud import create_car, get_car, delete_car, get_filtered_cars, get_user_cars, mark_car_as_sold
+from crud import create_car, get_car, delete_car, get_user_cars, mark_car_as_sold
 import logging
 
 protected_router = APIRouter()

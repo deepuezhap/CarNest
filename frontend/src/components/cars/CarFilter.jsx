@@ -16,18 +16,18 @@ const CarFilter = ({ updateParams }) => {
     num_previous_owners: "",
     insurance_status: "",
     registration_location: "",
-    has_power_windows: false,
-    has_power_steering: false,
-    has_car_history_report: false,
-    has_rear_parking_sensors: false,
-    has_central_locking: false,
-    has_air_conditioning: false,
-    has_reverse_camera: false,
-    has_abs: false,
-    has_fog_lamps: false,
-    has_power_mirrors: false,
-    has_gps_navigation: false,
-    has_keyless_start: false,
+    has_power_windows: null,
+    has_power_steering: null,
+    has_car_history_report: null,
+    has_rear_parking_sensors: null,
+    has_central_locking: null,
+    has_air_conditioning: null,
+    has_reverse_camera: null,
+    has_abs: null,
+    has_fog_lamps: null,
+    has_power_mirrors: null,
+    has_gps_navigation: null,
+    has_keyless_start: null,
   });
 
   // Handle input changes
@@ -35,13 +35,19 @@ const CarFilter = ({ updateParams }) => {
     const { name, value, type, checked } = e.target;
     setFilters((prevFilters) => ({
       ...prevFilters,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? (checked ? true : null) : value,
     }));
   };
 
-  // Apply filters
+  // Apply filters while excluding unchecked checkboxes
   const applyFilters = () => {
-    updateParams(filters);
+    const cleanedFilters = Object.fromEntries(
+      Object.entries(filters).filter(
+        ([key, value]) =>
+          value !== "" && value !== null // Remove empty strings & unchecked checkboxes
+      )
+    );
+    updateParams(cleanedFilters);
   };
 
   return (
@@ -87,21 +93,6 @@ const CarFilter = ({ updateParams }) => {
       <Row className="mb-3">
         <Col md={4}>
           <Form.Group>
-            <Form.Label>Min Mileage</Form.Label>
-            <Form.Control type="number" name="min_mileage" value={filters.min_mileage} onChange={handleChange} placeholder="Enter minimum mileage" />
-          </Form.Group>
-        </Col>
-        <Col md={4}>
-          <Form.Group>
-            <Form.Label>Max Mileage</Form.Label>
-            <Form.Control type="number" name="max_mileage" value={filters.max_mileage} onChange={handleChange} placeholder="Enter maximum mileage" />
-          </Form.Group>
-        </Col>
-      </Row>
-
-      <Row className="mb-3">
-        <Col md={4}>
-          <Form.Group>
             <Form.Label>Fuel Type</Form.Label>
             <Form.Select name="fuel_type" value={filters.fuel_type} onChange={handleChange}>
               <option value="">All</option>
@@ -120,37 +111,6 @@ const CarFilter = ({ updateParams }) => {
               <option value="Manual">Manual</option>
               <option value="Automatic">Automatic</option>
             </Form.Select>
-          </Form.Group>
-        </Col>
-        <Col md={4}>
-          <Form.Group>
-            <Form.Label>Previous Owners</Form.Label>
-            <Form.Control type="number" name="num_previous_owners" value={filters.num_previous_owners} onChange={handleChange} placeholder="Enter number of owners" />
-          </Form.Group>
-        </Col>
-      </Row>
-
-      <Row className="mb-3">
-        <Col md={4}>
-          <Form.Group>
-            <Form.Label>Insurance Status</Form.Label>
-            <Form.Select name="insurance_status" value={filters.insurance_status} onChange={handleChange}>
-              <option value="">All</option>
-              <option value="Comprehensive">Comprehensive</option>
-              <option value="Third-party">Third-party</option>
-            </Form.Select>
-          </Form.Group>
-        </Col>
-        <Col md={4}>
-          <Form.Group>
-            <Form.Label>Location</Form.Label>
-            <Form.Control type="text" name="location" value={filters.location} onChange={handleChange} placeholder="Enter location" />
-          </Form.Group>
-        </Col>
-        <Col md={4}>
-          <Form.Group>
-            <Form.Label>Registration Location</Form.Label>
-            <Form.Control type="text" name="registration_location" value={filters.registration_location} onChange={handleChange} placeholder="Enter registration location" />
           </Form.Group>
         </Col>
       </Row>
@@ -175,7 +135,7 @@ const CarFilter = ({ updateParams }) => {
               type="checkbox"
               label={feature.replace(/_/g, " ").replace("has ", "").toUpperCase()}
               name={feature}
-              checked={filters[feature]}
+              checked={filters[feature] === true}
               onChange={handleChange}
             />
           </Col>

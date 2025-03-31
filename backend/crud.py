@@ -128,7 +128,7 @@ def get_filtered_cars(
     
     # Numeric filters
     if year is not None:
-        query = query.filter(Car.year == year)
+        query = query.filter(Car.year >= year)
     if min_price is not None:
         query = query.filter(Car.price >= min_price)
     if max_price is not None:

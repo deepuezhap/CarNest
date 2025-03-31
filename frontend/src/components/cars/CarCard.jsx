@@ -53,8 +53,7 @@ const CarCard = ({ car }) => {
         </div>
         <div className="d-grid gap-2">
           <Button as={Link} to={`/cars/${id}`} variant="primary">View Details</Button> 
-          <Button variant="outline-secondary" onClick={() => console.log(seller_id)}>Contact Seller</Button>
-          <WhatsAppButton phoneNumber={8547449048} message="I need assistance with my order." />  
+          <WhatsAppButton phoneNumber={8848509216} message="I need assistance with my order." />  
         </div>
       </Card.Body>
     </Card>

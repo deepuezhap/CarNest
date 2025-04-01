@@ -38,7 +38,7 @@ const CarTextSearch = () => {
           <Col md={8}>
             <Form.Control
               type="text"
-              placeholder="Enter car description (e.g., 'red sports car')"
+              placeholder="Enter car description (e.g., 'a car like batmobile')"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
